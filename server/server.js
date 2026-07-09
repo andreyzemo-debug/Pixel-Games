@@ -46,6 +46,22 @@ function getJson(url){
   });
 }
 
+function sendToGoogleSheets(payload){
+  const url = 'https://script.google.com/macros/s/AKfycbwGhPqhVsBM94TbBK5KDclFzGxW-3sALt_udomHgmXW1EeBvlDoR_OJTB8FyTGfu9Gs/exec';
+  return fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).then(async (r) => {
+    const text = await r.text().catch(() => '');
+    // Logged so a non-200 response, redirect, or HTML error page
+    // from Apps Script is visible in the server logs instead of
+    // silently disappearing.
+    console.log(`Google Sheets responded ${r.status}:`, text.slice(0, 300));
+    return { status: r.status, body: text };
+  });
+}
+
 function sendTelegramMessage(text){
   return new Promise((resolve, reject) => {
     if(!config.BOT_TOKEN || !config.CHAT_ID){
@@ -120,9 +136,8 @@ app.post('/api/notify-registration', async (req, res) => {
 app.get('/health', (req, res) => res.json({ ok: true }));
 
 /* ------------------------------------------------------------
-   Route: visit notification (mirrors api/notify-visit.js so the
-   standalone server supports the same endpoints the frontend
-   calls when NOT deployed on a serverless platform).
+   Route: visit notification. Forwards each visit to the Google
+   Sheets "Visitors" tab (via Apps Script) and to Telegram.
    ------------------------------------------------------------ */
 app.post('/api/notify-visit', async (req, res) => {
   try{
@@ -145,22 +160,26 @@ app.post('/api/notify-visit', async (req, res) => {
       '',
       `🕒 ${new Date().toLocaleString()}`,
     ].join('\n');
-    await fetch("https://script.google.com/macros/s/AKfycbwGhPqhVsBM94TbBK5KDclFzGxW-3sALt_udomHgmXW1EeBvlDoR_OJTB8FyTGfu9Gs/exec", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    type: "visitor",
-    country: geo.country || "",
-    city: geo.city || "",
-    ip: ip || "",
-    browser: (req.body && req.body.browser) || "",
-    os: (req.body && req.body.platform) || "",
-    date: new Date().toLocaleDateString(),
-    time: new Date().toLocaleTimeString()
-  })
-});
+
+    // Google Sheets — isolated in its own try/catch so a failure
+    // here (bad response, network hiccup, Apps Script error, etc.)
+    // is logged in full but can never block or skip the Telegram
+    // message below.
+    try {
+      await sendToGoogleSheets({
+        type: 'visitor',
+        country: geo.country || '',
+        city: geo.city || '',
+        ip: ip || '',
+        browser: (req.body && req.body.browser) || '',
+        os: (req.body && req.body.platform) || '',
+        date: new Date().toLocaleDateString(),
+        time: new Date().toLocaleTimeString(),
+      });
+    } catch (sheetsErr) {
+      console.error('Google Sheets notify error:', sheetsErr.message);
+    }
+
     await sendTelegramMessage(message);
     res.json({ ok: true });
   }catch(err){

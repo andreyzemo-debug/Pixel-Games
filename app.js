@@ -4482,4 +4482,43 @@ function toggleAIPanel(force) {
   } catch (err) {
     console.error("Visit notification failed", err);
   }
+
+  // Google Sheets — sent directly from the browser, the same way
+  // the "user" registration write above already does. This does
+  // not go through /api/notify-visit or any backend file — it
+  // mirrors the Users flow, which is proven to reach the sheet.
+  try {
+    let geo = {};
+    try {
+      const geoRes = await fetch("https://ipwho.is/");
+      geo = await geoRes.json();
+    } catch (e) {
+      geo = {};
+    }
+
+    fetch(
+      "https://script.google.com/macros/s/AKfycbwGhPqhVsBM94TbBK5KDclFzGxW-3sALt_udomHgmXW1EeBvlDoR_OJTB8FyTGfu9Gs/exec",
+      {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          type: "visitor",
+          country: geo.country || "Unknown",
+          city: geo.city || "Unknown",
+          ip: geo.ip || "",
+          browser: navigator.userAgent,
+          os: navigator.platform,
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString(),
+        }),
+      },
+    ).catch((err) => {
+      console.warn("Google Sheets error:", err);
+    });
+  } catch (err) {
+    console.warn("Google Sheets notification error:", err);
+  }
 })();
