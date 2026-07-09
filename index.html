@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pixel&Games — Game Launcher</title>
+<script>
+  /* Anti-flash: apply the saved Light/Dark theme and accent color
+     before first paint, so there's no flash of the wrong colors. */
+  (function(){
+    try{
+      var savedTheme = localStorage.getItem('pixelgames_theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    }catch(e){}
+    try{
+      var accent = 'auto';
+      var gmail = localStorage.getItem('pixelgames_session');
+      if(gmail){
+        var users = JSON.parse(localStorage.getItem('pixelgames_users') || '{}');
+        var u = users[gmail];
+        if(u && u.theme) accent = u.theme;
+      }
+      document.documentElement.setAttribute('data-accent', accent);
+    }catch(e){}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ================= LANGUAGE SELECTION SCREEN (added) ================= -->
+<div id="languageScreen">
+  <div class="lang-select-wrap">
+    <div class="lang-select-title" data-i18n="lang_select_title">Choose your language</div>
+    <div class="lang-select-sub" data-i18n="lang_select_sub">Select a language to continue. You can always change it later in Profile.</div>
+    <div class="lang-options">
+      <button class="lang-option" onclick="selectLanguage('en')"><span class="lang-flag">🇺🇸</span> English <span class="lang-native">English</span></button>
+      <button class="lang-option" onclick="selectLanguage('ru')"><span class="lang-flag">🇷🇺</span> Russian <span class="lang-native">Русский</span></button>
+      <button class="lang-option" onclick="selectLanguage('uz')"><span class="lang-flag">🇺🇿</span> Uzbek <span class="lang-native">O'zbekcha</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= AUTH SCREEN ================= -->
+<div id="authScreen">
+  <div class="auth-grid-lines"></div>
+  <div class="auth-wrap">
+
+    <div class="vault-emblem">
+      <div class="vault-ring spin"></div>
+      <div class="vault-ring r2"></div>
+      <div class="vault-hub">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#d4a94a" stroke-width="1.6">
+          <rect x="4" y="10" width="16" height="10" rx="1.5"/>
+          <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+          <circle cx="12" cy="15" r="1.6" fill="#d4a94a" stroke="none"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="auth-panel">
+      <div class="auth-brand">Pixel<span>&amp;Games</span></div>
+      <div class="auth-sub" data-i18n="auth_sub">Your personal game collection, sealed and ready.</div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')" data-i18n="tab_login">Sign In</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')" data-i18n="tab_register">Register</button>
+      </div>
+
+      <div class="auth-msg" id="authMsg"></div>
+
+      <!-- LOGIN FORM -->
+      <form id="loginForm" onsubmit="return handleLogin(event)">
+        <div class="field">
+          <label for="loginGmail" data-i18n="label_gmail">Gmail</label>
+          <input type="text" id="loginGmail" placeholder="you@gmail.com" autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="loginPassword" data-i18n="label_password">Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-primary" data-i18n="btn_enter_vault">Enter Vault</button>
+      </form>
+
+      <!-- REGISTER FORM -->
+      <form id="registerForm" class="hidden" onsubmit="return handleRegister(event)">
+        <div class="field">
+          <label for="regNickname" data-i18n="label_nickname">Nickname</label>
+          <input type="text" id="regNickname" placeholder="How should we call you?" data-i18n-ph="ph_nickname">
+        </div>
+        <div class="field">
+          <label for="regGmail" data-i18n="label_gmail">Gmail</label>
+          <input type="text" id="regGmail" placeholder="you@gmail.com" autocomplete="username">
+        </div>
+        <div class="field">
+          <label for="regPassword" data-i18n="label_password">Password</label>
+          <input type="password" id="regPassword" placeholder="At least 6 characters" autocomplete="new-password" data-i18n-ph="ph_password_min">
+        </div>
+        <button type="submit" class="btn-primary" data-i18n="btn_create_account">Create Account</button>
+      </form>
+
+      <div class="auth-foot" id="authFoot"><span data-i18n="auth_foot_new">New here?</span> <a href="#" onclick="switchTab('register');return false;" style="color:var(--gold-bright); font-weight:600;" data-i18n="auth_foot_create_link">Create an account</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<div id="appShell" class="hidden">
+  <div class="topnav">
+    <div class="topnav-left">
+      <button class="topnav-icon-btn mobile-menu-btn" id="mobileMenuBtn" onclick="toggleMobileNav(event)" title="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <div class="side-brand">Pixel<span>&amp;Games</span></div>
+    </div>
+
+    <nav class="topnav-center" id="topnavCenter">
+      <button class="nav-item active" id="navStore" onclick="switchView('store'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9l1-5h16l1 5M3 9v10a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9M3 9h18M8 13h8"/></svg>
+        <span data-i18n="nav_store">Store</span>
+      </button>
+      <button class="nav-item" id="navLibrary" onclick="switchView('library'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v5"/></svg>
+        <span data-i18n="nav_library">Library</span>
+      </button>
+      <button class="nav-item" id="navWallet" onclick="switchView('wallet'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M16 14h2"/></svg>
+        <span data-i18n="nav_wallet">Wallet</span>
+      </button>
+      <button class="nav-item" id="navProfile" onclick="switchView('profile'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="3.5"/><path d="M4 20c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>
+        <span data-i18n="nav_profile">Profile</span>
+      </button>
+      <button class="nav-item" id="navFriends" onclick="switchView('friends'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3"/><path d="M2 20c0.8-3.6 3.6-6 7-6s6.2 2.4 7 6"/><circle cx="17" cy="8" r="2.4"/><path d="M16 14.2c2.6 0.5 4.4 2.6 5 5.8"/></svg>
+        <span data-i18n="nav_friends">Friends</span>
+      </button>
+      <button class="nav-item" id="navPartnership" onclick="switchView('partnership'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M16 11a4 4 0 1 0-4-4M8 21v-2a4 4 0 0 1 4-4h1M17 21v-3a3 3 0 0 0-3-3"/><circle cx="8" cy="8" r="3"/></svg>
+        <span data-i18n="nav_partnership">Partnership</span>
+      </button>
+      <button class="nav-item" id="navAdvertisements" onclick="switchView('advertisements'); closeMobileNav();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9h6M7 13h10"/></svg>
+        <span data-i18n="nav_ads">Advertisements</span>
+      </button>
+    </nav>
+
+    <div class="topnav-right">
+      <!-- ================= COINS + ADD COINS (added) ================= -->
+      <div class="side-coins-pill" id="sideCoinsPill" onclick="switchView('wallet')" title="Coins">
+        <span class="side-coins-icon">🪙</span>
+        <span id="sideCoinsValue">0</span>
+      </div>
+      <button class="topnav-icon-btn topnav-addcoins-btn" onclick="switchView('wallet')" title="Add Coins">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+
+      <!-- ================= NOTIFICATIONS (added) ================= -->
+      <div class="topnav-notif-wrap">
+        <button class="topnav-icon-btn" id="notifBtn" onclick="toggleNotifications(event)" title="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-dot hidden" id="notifDot"></span>
+        </button>
+        <div class="notif-dropdown hidden" id="notifDropdown">
+          <div class="notif-dropdown-title" data-i18n="notif_heading">Notifications</div>
+          <div class="notif-list" id="notifList"></div>
+        </div>
+      </div>
+
+      <!-- ================= USER MENU / DROPDOWN (added) ================= -->
+      <div class="topnav-user-wrap">
+        <button class="topnav-user" id="topnavUser" onclick="toggleUserMenu(event)">
+          <div class="side-avatar-circle" id="sideAvatarCircle">🎮</div>
+          <span class="side-user-name" id="sideNick">—</span>
+          <span class="side-premium-badge hidden" id="sidePremiumBadge">👑</span>
+          <svg class="dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div class="user-dropdown-menu hidden" id="userDropdownMenu">
+          <div class="side-user-mail" id="sideMail">—</div>
+          <button class="btn-ghost" onclick="switchView('profile'); closeUserMenu();" data-i18n="nav_profile">Profile</button>
+          <button class="btn-ghost" onclick="logout()" data-i18n="btn_logout">Log Out</button>
+        </div>
+      </div>
+
+      <!-- ================= LIGHT / DARK THEME TOGGLE (added) — icon only ================= -->
+      <button class="topnav-icon-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleSiteTheme()" title="Toggle light / dark theme">
+        <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="hidden"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+        <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7.2 7.2 0 0 0 9.8 9.8z"/></svg>
+      </button>
+
+      <!-- ================= FULLSCREEN TOGGLE (added) — icon only ================= -->
+      <button class="topnav-icon-btn fullscreen-toggle-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">
+        <svg id="fsIconEnter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        <svg id="fsIconExit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="hidden"><path d="M9 3v3a2 2 0 0 1-2 2H4M15 3v3a2 2 0 0 0 2 2h3M9 21v-3a2 2 0 0 0-2-2H4M15 21v-3a2 2 0 0 1 2-2h3"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="main">
+    <!-- STORE VIEW -->
+    <div id="storeView">
+      <div class="view-head">
+        <div class="view-title" data-i18n="store_title">Store</div>
+        <div class="view-desc" data-i18n="store_desc">Browse the catalog. Add titles to your library to unlock play.</div>
+      </div>
+
+      <!-- ================= STORE SEARCH (added) ================= -->
+      <div class="search-bar-wrap">
+        <div class="search-bar">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="storeSearchInput" class="search-input" placeholder="Search games..." data-i18n-ph="search_placeholder" autocomplete="off" oninput="onStoreSearchInput()">
+          <button type="button" class="search-clear-btn" id="storeSearchClear" onclick="clearStoreSearch()" title="Clear search">✕</button>
+        </div>
+      </div>
+
+      <div class="grid" id="storeGrid"></div>
+    </div>
+
+    <!-- LIBRARY VIEW -->
+    <div id="libraryView" class="hidden">
+      <div class="view-head">
+        <div class="view-title" data-i18n="library_title">Library</div>
+        <div class="view-desc" data-i18n="library_desc">Games you own. Hit Play to launch.</div>
+      </div>
+
+      <!-- ================= LIBRARY SEARCH (added) ================= -->
+      <div class="search-bar-wrap">
+        <div class="search-bar">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="text" id="librarySearchInput" class="search-input" placeholder="Search games..." data-i18n-ph="search_placeholder" autocomplete="off" oninput="onLibrarySearchInput()">
+          <button type="button" class="search-clear-btn" id="librarySearchClear" onclick="clearLibrarySearch()" title="Clear search">✕</button>
+        </div>
+      </div>
+
+      <div class="grid" id="libraryGrid"></div>
+    </div>
+
+    <!-- WALLET VIEW (added) -->
+    <div id="walletView" class="hidden">
+      <div class="glass-card wallet-hero">
+        <div class="wallet-icon-float">💰</div>
+        <div class="wallet-balance-label">Pixel&amp;Games Wallet Balance</div>
+        <div class="wallet-balance-value" id="walletBalance">$0.00</div>
+      </div>
+
+      <!-- ================= DAILY BONUS (added) ================= -->
+      <div class="glass-card daily-bonus-card" id="dailyBonusCard">
+        <div class="daily-bonus-icon">🎁</div>
+        <div class="daily-bonus-info">
+          <div class="daily-bonus-title" data-i18n="daily_bonus_title">Daily Bonus</div>
+          <div class="daily-bonus-desc" data-i18n="daily_bonus_desc">Claim a free reward every 24 hours.</div>
+        </div>
+        <div class="daily-bonus-reward" data-i18n="daily_bonus_reward">+50 Coins</div>
+        <button class="btn-sm gold daily-bonus-btn" id="dailyBonusBtn" onclick="claimDailyBonus()" data-i18n="daily_bonus_claim_btn">Claim Reward</button>
+        <div class="daily-bonus-timer" id="dailyBonusTimer"></div>
+      </div>
+
+      <div class="wallet-layout">
+        <div class="glass-card wallet-panel">
+          <div class="wallet-panel-title" data-i18n="wallet_choose_amount">Choose an amount</div>
+          <div class="amount-grid" id="topupAmountGrid"></div>
+          <div class="custom-amount">
+            <span>$</span>
+            <input type="text" id="customTopupAmount" data-i18n-ph="wallet_custom_amount" placeholder="Custom amount" inputmode="decimal" oninput="onCustomTopupInput()">
+          </div>
+
+          <div class="wallet-panel-title" data-i18n="wallet_payment_card">Payment card</div>
+          <div class="card-preview" id="cardPreview">
+            <div class="card-preview-top">
+              <span>Pixel&amp;Games</span>
+              <div class="card-preview-chip"></div>
+            </div>
+            <div class="card-preview-number" id="cardPreviewNumber">•••• •••• •••• ••••</div>
+            <div class="card-preview-bottom">
+              <span id="cardPreviewHolder">CARD HOLDER</span>
+              <span id="cardPreviewExpiry">MM/YY</span>
+            </div>
+          </div>
+
+          <div class="card-form-field">
+            <label for="cardHolder" data-i18n="wallet_card_holder">Card Holder Name</label>
+            <input type="text" id="cardHolder" placeholder="Jane Doe" oninput="updateCardPreview()">
+          </div>
+          <div class="card-form-field">
+            <label for="cardNumber" data-i18n="wallet_card_number">Card Number</label>
+            <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19" oninput="formatCardNumberInput(this); updateCardPreview();">
+          </div>
+          <div class="card-form-row">
+            <div class="card-form-field">
+              <label for="cardExpiry" data-i18n="wallet_expiry">Expiration Date</label>
+              <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5" oninput="formatExpiryInput(this); updateCardPreview();">
+            </div>
+            <div class="card-form-field">
+              <label for="cardCVV" data-i18n="wallet_cvv">CVV</label>
+              <input type="password" id="cardCVV" placeholder="123" maxlength="4" oninput="this.value=this.value.replace(/\D/g,'');">
+            </div>
+          </div>
+          <label class="save-card-row">
+            <input type="checkbox" id="saveCardCheckbox">
+            <span data-i18n="wallet_save_card">Save card for next time</span>
+          </label>
+
+          <button class="btn-wallet-primary" onclick="processTopup()" data-i18n="wallet_topup_btn">Top Up</button>
+        </div>
+
+        <div class="glass-card wallet-history">
+          <div class="wallet-panel-title" data-i18n="wallet_recent_topups">Recent top-ups</div>
+          <div id="topupHistoryList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE VIEW (expanded) -->
+    <div id="profileView" class="hidden">
+      <div class="view-head">
+        <div class="view-title" data-i18n="profile_title">Profile</div>
+        <div class="view-desc" data-i18n="profile_desc">Your stats, achievements, and account settings.</div>
+      </div>
+
+      <div class="glass-card profile-hero" id="profileHero">
+        <div class="avatar-wrap" style="width:96px;">
+          <div class="avatar-circle" id="avatarCircle">🎮</div>
+          <div class="avatar-level-badge" id="avatarLevelBadge">LV 1</div>
+          <button class="btn-change-avatar" onclick="changeAvatar()" data-i18n="btn_change_avatar">Change Avatar</button>
+          <!-- ================= CUSTOM AVATAR (added) ================= -->
+          <input type="file" id="avatarUploadInput" accept="image/*" class="visually-hidden" onchange="handleAvatarUpload(event)">
+          <button class="btn-change-avatar" onclick="document.getElementById('avatarUploadInput').click()" data-i18n="btn_upload_avatar">Upload Photo</button>
+          <button class="btn-change-avatar hidden" id="removeAvatarBtn" onclick="removeCustomAvatar()" data-i18n="btn_remove_avatar">Remove Avatar</button>
+        </div>
+        <div class="profile-hero-info">
+          <div class="profile-hero-name-row">
+            <div class="profile-hero-name" id="heroNick">—</div>
+            <span class="premium-pill hidden" id="heroPremiumPill">👑 PREMIUM</span>
+          </div>
+          <div class="profile-hero-mail" id="heroMail">—</div>
+          <!-- ================= COUNTRY (added) ================= -->
+          <div class="profile-hero-country" id="heroCountry"></div>
+          <!-- ================= USER BIO (added) ================= -->
+          <div class="profile-hero-bio-row">
+            <div class="profile-hero-bio" id="heroBio">No bio yet. Tell other players about yourself.</div>
+            <button class="btn-edit-bio" onclick="focusBioEditor()" title="Edit bio">✏️</button>
+          </div>
+          <div class="xp-row"><span id="xpLabel">XP 0 / 100</span><span id="xpLevelLabel">Level 1</span></div>
+          <div class="xp-bar-track"><div class="xp-bar-fill" id="xpBarFill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="glass-card stat-card"><div class="stat-value" id="statGames">0</div><div class="stat-label" data-i18n="stat_games_owned">Games Owned</div></div>
+        <div class="glass-card stat-card"><div class="stat-value" id="statHours">0</div><div class="stat-label" data-i18n="stat_hours_played">Hours Played</div></div>
+        <div class="glass-card stat-card"><div class="stat-value" id="statAch">0</div><div class="stat-label" data-i18n="stat_achievements">Achievements</div></div>
+        <div class="glass-card stat-card"><div class="stat-value" id="statWishlist">0</div><div class="stat-label" data-i18n="stat_wishlist">Wishlist</div></div>
+        <div class="glass-card stat-card coin-stat-card"><div class="stat-value" id="statCoins">0</div><div class="stat-label" data-i18n="stat_coins">Coins</div></div>
+      </div>
+
+      <div class="profile-extra-row">
+        <div class="glass-card info-chip"><div class="profile-label" data-i18n="favorite_game_label">Favorite Game</div><div class="profile-val" id="statFavGame">—</div></div>
+        <div class="glass-card info-chip"><div class="profile-label" data-i18n="favorites_count_label">Favorites Count</div><div class="profile-val" id="statFavCount">0</div></div>
+        <div class="glass-card info-chip"><div class="profile-label" data-i18n="member_since_label">Member Since</div><div class="profile-val" id="statCreated">—</div></div>
+      </div>
+
+      <!-- ================= PREMIUM (added) ================= -->
+      <div class="section-subtitle" data-i18n="premium_heading">Pixel&amp;Games Premium</div>
+      <div class="glass-card premium-card" id="premiumCard">
+        <div class="premium-card-icon" id="premiumCardIcon">🔓</div>
+        <div class="premium-card-body">
+          <div class="premium-card-status" id="premiumCardStatus" data-i18n="premium_status_free">Free Account</div>
+          <ul class="premium-benefits-list">
+            <li data-i18n="premium_benefits_badge">Premium badge on profile</li>
+            <li data-i18n="premium_benefits_border">Exclusive profile border</li>
+            <li data-i18n="premium_benefits_icon">Golden Premium icon</li>
+            <li data-i18n="premium_benefits_cosmetic">Premium-only cosmetic effects</li>
+          </ul>
+          <div class="premium-card-price" id="premiumCardPrice" data-i18n="premium_price_label">One-time activation from your Wallet balance</div>
+        </div>
+        <button class="btn-sm gold premium-activate-btn" id="premiumActivateBtn" onclick="activatePremium()" data-i18n="premium_activate_btn">Activate Premium</button>
+      </div>
+
+      <div class="section-subtitle" data-i18n="achievements_heading">Achievements</div>
+      <div class="achievements-grid" id="achievementsGrid"></div>
+
+      <!-- ================= PLAY TIME (added) ================= -->
+      <div class="section-subtitle" data-i18n="playtime_heading">Play Time</div>
+      <div class="profile-extra-row">
+        <div class="glass-card info-chip"><div class="profile-label" data-i18n="playtime_total_hours">Total Hours Played</div><div class="profile-val" id="playtimeTotalHours">0h</div></div>
+        <div class="glass-card info-chip"><div class="profile-label" data-i18n="daily_reward_status_heading">Daily Reward Status</div><div class="profile-val" id="dailyRewardStatusVal">—</div></div>
+      </div>
+      <div class="section-subtitle" data-i18n="playtime_per_game" style="margin-top:6px;">Per Game Playtime</div>
+      <div id="perGamePlaytimeList" class="per-game-playtime-list"></div>
+
+      <div class="section-subtitle" data-i18n="recent_activity_heading">Recent Activity</div>
+      <div id="recentActivityList" class="recent-activity-list"></div>
+
+      <!-- ================= ACTIVITY GRAPH (added) ================= -->
+      <div class="section-subtitle" data-i18n="activity_graph_heading">Activity Graph</div>
+      <div class="glass-card activity-chart-card">
+        <div class="activity-chart-header">
+          <div class="activity-legend">
+            <span class="legend-item"><span class="legend-dot legend-logins"></span><span data-i18n="activity_legend_logins">Logins</span></span>
+            <span class="legend-item"><span class="legend-dot legend-games"></span><span data-i18n="activity_legend_games">Games Played</span></span>
+            <span class="legend-item"><span class="legend-dot legend-purchases"></span><span data-i18n="activity_legend_purchases">Purchases</span></span>
+            <span class="legend-item"><span class="legend-dot legend-library"></span><span data-i18n="activity_legend_library">Library Adds</span></span>
+          </div>
+          <div class="activity-range-toggle">
+            <button class="btn-sm line active" id="activityRangeBtn7" onclick="setActivityRange(7)" data-i18n="activity_range_7">7 Days</button>
+            <button class="btn-sm line" id="activityRangeBtn30" onclick="setActivityRange(30)" data-i18n="activity_range_30">30 Days</button>
+          </div>
+        </div>
+        <div class="activity-chart" id="activityChart"></div>
+      </div>
+
+      <!-- ================= PURCHASE HISTORY (added) ================= -->
+      <div class="section-subtitle" data-i18n="purchase_history_heading">Purchase History</div>
+      <div id="purchaseHistoryList" class="purchase-history-list"></div>
+
+      <div class="section-subtitle" data-i18n="settings_heading">Settings</div>
+      <div class="glass-card settings-card">
+        <div class="settings-field">
+          <label for="settingsNickname" data-i18n="settings_nickname">Nickname</label>
+          <input type="text" id="settingsNickname" oninput="saveSettingsNickname()">
+        </div>
+        <div class="settings-field">
+          <label data-i18n="settings_avatar">Avatar</label>
+          <div class="avatar-picker" id="avatarPicker"></div>
+        </div>
+        <!-- ================= USER BIO (added) ================= -->
+        <div class="settings-field">
+          <label for="bioTextarea" data-i18n="settings_bio">Bio</label>
+          <textarea id="bioTextarea" maxlength="250" rows="3" oninput="onBioInput()" data-i18n-ph="ph_bio" placeholder="Tell other players about yourself…"></textarea>
+          <div class="bio-counter" id="bioCounter">0 / 250</div>
+        </div>
+        <!-- ================= COUNTRY (added) ================= -->
+        <div class="settings-field">
+          <label for="countrySelect" data-i18n="settings_country">Country</label>
+          <select id="countrySelect" onchange="saveCountry()"></select>
+        </div>
+        <div class="settings-field">
+          <label data-i18n="settings_theme">Accent Color</label>
+          <div class="theme-swatches" id="themeSwatches">
+            <button class="theme-swatch" data-t="auto" onclick="setTheme('auto')" data-i18n="theme_auto">Auto</button>
+            <button class="theme-swatch" data-t="purple" onclick="setTheme('purple')" data-i18n="theme_purple">Purple</button>
+            <button class="theme-swatch" data-t="emerald" onclick="setTheme('emerald')" data-i18n="theme_emerald">Emerald</button>
+            <button class="theme-swatch" data-t="blue" onclick="setTheme('blue')" data-i18n="theme_blue">Blue</button>
+            <button class="theme-swatch" data-t="gold" onclick="setTheme('gold')" data-i18n="theme_gold">Gold</button>
+          </div>
+          <div class="settings-hint" data-i18n="theme_auto_hint">"Auto" follows your Light/Dark mode: Purple in Dark, Emerald in Light.</div>
+        </div>
+        <div class="settings-field">
+          <label data-i18n="settings_language">Language</label>
+          <div class="theme-swatches" id="langSwatches">
+            <button class="theme-swatch lang-swatch" data-lang="en" onclick="selectLanguage('en')">English</button>
+            <button class="theme-swatch lang-swatch" data-lang="ru" onclick="selectLanguage('ru')">Русский</button>
+            <button class="theme-swatch lang-swatch" data-lang="uz" onclick="selectLanguage('uz')">O'zbekcha</button>
+          </div>
+        </div>
+        <div class="settings-saved-hint" id="settingsSavedHint">Saved automatically ✓</div>
+      </div>
+
+      <div class="glass-card profile-card" style="max-width:none;">
+        <div class="profile-row"><span class="profile-label" data-i18n="settings_nickname">Nickname</span><span class="profile-val" id="profNick">—</span></div>
+        <div class="profile-row"><span class="profile-label">Gmail</span><span class="profile-val" id="profMail">—</span></div>
+        <div class="profile-row"><span class="profile-label">Library size</span><span class="profile-val" id="profLibCount">—</span></div>
+        <div class="danger-zone">
+          <div class="profile-label" style="margin-bottom:10px;" data-i18n="danger_zone">Danger zone</div>
+          <button class="btn-danger" onclick="deleteAccount()" data-i18n="btn_delete_account">Delete Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PARTNERSHIP VIEW (added) ================= -->
+    <div id="partnershipView" class="hidden">
+      <div class="glass-card page-hero">
+        <div class="page-hero-title">Partner with Pixel&amp;Games</div>
+        <div class="page-hero-sub">Publish your game to a growing library of players. We handle discovery, updates, and player trust — you focus on building great games.</div>
+      </div>
+
+      <div class="section-subtitle">Why partner with us</div>
+      <div class="benefit-grid" style="margin-bottom:26px;">
+        <div class="glass-card benefit-card"><div class="benefit-icon">📈</div><div class="benefit-title">Increase Your Audience</div><div class="benefit-desc">Get discovered by players already browsing the Store and Library every day.</div></div>
+        <div class="glass-card benefit-card"><div class="benefit-icon">🚀</div><div class="benefit-title">Easy Publishing</div><div class="benefit-desc">A streamlined submission flow gets your game live without the busywork.</div></div>
+        <div class="glass-card benefit-card"><div class="benefit-icon">📊</div><div class="benefit-title">Developer Dashboard</div><div class="benefit-desc">Track installs, engagement, and player feedback in one clear view.</div></div>
+        <div class="glass-card benefit-card"><div class="benefit-icon">🌍</div><div class="benefit-title">Worldwide Players</div><div class="benefit-desc">Reach a global player base across every device the launcher supports.</div></div>
+        <div class="glass-card benefit-card"><div class="benefit-icon">⚡</div><div class="benefit-title">Fast Updates</div><div class="benefit-desc">Push patches and content updates that reach players almost instantly.</div></div>
+        <div class="glass-card benefit-card"><div class="benefit-icon">🤝</div><div class="benefit-title">Professional Support</div><div class="benefit-desc">A dedicated partnerships team is on hand whenever you need help.</div></div>
+      </div>
+
+      <div class="section-subtitle">By the numbers</div>
+      <div class="stats-strip" style="margin-bottom:26px;">
+        <div class="glass-card stat-strip-card"><div class="stat-strip-value" data-target="500" data-suffix="+">0</div><div class="stat-strip-label">Developers</div></div>
+        <div class="glass-card stat-strip-card"><div class="stat-strip-value" data-target="2" data-suffix="M+">0</div><div class="stat-strip-label">Players</div></div>
+        <div class="glass-card stat-strip-card"><div class="stat-strip-value" data-target="100" data-suffix="+">0</div><div class="stat-strip-label">Published Games</div></div>
+      </div>
+
+      <div class="section-subtitle">Apply to partner</div>
+      <div class="glass-card wallet-panel" style="margin-bottom:26px;">
+        <div class="form-msg" id="partnershipMsg"></div>
+        <form id="partnershipForm" onsubmit="return submitPartnership(event)">
+          <div class="form-grid">
+            <div class="form-field"><label for="pStudio">Developer Studio Name</label><input type="text" id="pStudio" placeholder="Nova Interactive"></div>
+            <div class="form-field"><label for="pDevName">Developer Name</label><input type="text" id="pDevName" placeholder="Your full name"></div>
+            <div class="form-field"><label for="pEmail">Email</label><input type="text" id="pEmail" placeholder="studio@example.com"></div>
+            <div class="form-field"><label for="pGameName">Game Name</label><input type="text" id="pGameName" placeholder="Your game's title"></div>
+            <div class="form-field"><label for="pGenre">Game Genre</label>
+              <select id="pGenre">
+                <option value="">Select a genre…</option>
+                <option>Action</option><option>Adventure</option><option>RPG</option><option>Strategy</option>
+                <option>Puzzle</option><option>Horror</option><option>Platformer</option><option>Simulation</option><option>Other</option>
+              </select>
+            </div>
+            <div class="form-field"><label for="pWebsite">Website</label><input type="text" id="pWebsite" placeholder="https://yourstudio.com"></div>
+            <div class="form-field full"><label for="pMessage">Message</label><textarea id="pMessage" placeholder="Tell us about your game and timeline…"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-wallet-primary" style="flex:1;">Send Request</button>
+            <button type="button" class="btn-sm line" style="flex:1;" onclick="clearPartnershipForm()">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section-subtitle">Frequently asked questions</div>
+      <div class="faq-list" id="partnershipFAQ"></div>
+    </div>
+
+    <!-- ================= ADVERTISEMENTS VIEW (added) ================= -->
+    <div id="advertisementsView" class="hidden">
+      <div class="glass-card page-hero">
+        <div class="page-hero-title">Advertise on Pixel&amp;Games</div>
+        <div class="page-hero-sub">Put your brand in front of an engaged gaming audience. Browse our ad formats and packages below — this page is a design preview only.</div>
+      </div>
+
+      <div class="section-subtitle">Ad formats</div>
+      <div class="ad-banner-grid" style="margin-bottom:26px;">
+        <div class="ad-banner ad-hero-banner"><span class="ab-label">Large Hero Banner</span><span class="ab-size">1200 × 300</span></div>
+        <div class="ad-banner ad-medium-banner"><span class="ab-label">Medium Banner</span><span class="ab-size">600 × 200</span></div>
+        <div class="ad-banner ad-square-banner"><span class="ab-label">Square Banner</span><span class="ab-size">300 × 300</span></div>
+        <div class="ad-banner ad-sidebar-banner"><span class="ab-label">Sidebar Banner</span><span class="ab-size">160 × 400</span></div>
+        <div class="ad-banner ad-video-banner"><div class="play-badge">▶</div><span class="ab-label">Video Advertisement</span><span class="ab-size">Placeholder</span></div>
+        <div class="ad-banner ad-featured-banner"><span class="ab-label">✦ Featured Advertisement</span><span class="ab-size">Top placement, all pages</span></div>
+      </div>
+
+      <div class="section-subtitle">Sponsor spotlight</div>
+      <div class="sponsor-grid" style="margin-bottom:26px;">
+        <div class="glass-card sponsor-card"><div class="sponsor-mark">🎧</div><div class="benefit-title">AudioForge</div></div>
+        <div class="glass-card sponsor-card"><div class="sponsor-mark">🖥️</div><div class="benefit-title">ByteRig</div></div>
+        <div class="glass-card sponsor-card"><div class="sponsor-mark">🕹️</div><div class="benefit-title">GripPad</div></div>
+        <div class="glass-card sponsor-card"><div class="sponsor-mark">🌐</div><div class="benefit-title">NetlinePro</div></div>
+      </div>
+
+      <div class="section-subtitle">Advertising packages</div>
+      <div class="package-grid" style="margin-bottom:26px;">
+        <div class="glass-card package-card">
+          <div class="package-name">Starter</div>
+          <div class="package-price">$99<span>/mo</span></div>
+          <ul class="package-features">
+            <li>1 Medium Banner</li><li>Store page placement</li><li>Monthly performance report</li>
+          </ul>
+          <button class="btn-sm gold" style="width:100%;" onclick="choosePackage('Starter')">Choose Starter</button>
+        </div>
+        <div class="glass-card package-card popular">
+          <div class="package-badge">Most Popular</div>
+          <div class="package-name">Premium</div>
+          <div class="package-price">$299<span>/mo</span></div>
+          <ul class="package-features">
+            <li>1 Hero Banner + 1 Square</li><li>Store &amp; Library placement</li><li>Weekly performance report</li><li>Priority support</li>
+          </ul>
+          <button class="btn-sm buy" style="width:100%;" onclick="choosePackage('Premium')">Choose Premium</button>
+        </div>
+        <div class="glass-card package-card">
+          <div class="package-name">Ultimate</div>
+          <div class="package-price">$799<span>/mo</span></div>
+          <ul class="package-features">
+            <li>Featured Advertisement slot</li><li>Video Advertisement</li><li>Site-wide placement</li><li>Dedicated account manager</li>
+          </ul>
+          <button class="btn-sm gold" style="width:100%;" onclick="choosePackage('Ultimate')">Choose Ultimate</button>
+        </div>
+      </div>
+
+      <div class="section-subtitle">Request advertising</div>
+      <div class="glass-card wallet-panel" style="margin-bottom:26px;" id="adFormPanel">
+        <div class="form-msg" id="adMsg"></div>
+        <form id="adForm" onsubmit="return submitAdRequest(event)">
+          <div class="form-grid">
+            <div class="form-field"><label for="aCompany">Company Name</label><input type="text" id="aCompany" placeholder="Your company"></div>
+            <div class="form-field"><label for="aEmail">Email</label><input type="text" id="aEmail" placeholder="you@company.com"></div>
+            <div class="form-field"><label for="aWebsite">Website</label><input type="text" id="aWebsite" placeholder="https://company.com"></div>
+            <div class="form-field"><label for="aType">Advertisement Type</label>
+              <select id="aType">
+                <option value="">Select a format…</option>
+                <option>Large Hero Banner</option><option>Medium Banner</option><option>Square Banner</option>
+                <option>Sidebar Banner</option><option>Video Advertisement</option><option>Featured Advertisement</option>
+              </select>
+            </div>
+            <div class="form-field full"><label for="aBudget">Budget</label><input type="text" id="aBudget" placeholder="e.g. $500 / month"></div>
+            <div class="form-field full"><label for="aMessage">Message</label><textarea id="aMessage" placeholder="Tell us about your campaign…"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn-wallet-primary" style="flex:1;">Submit</button>
+            <button type="button" class="btn-sm line" style="flex:1;" onclick="clearAdForm()">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="section-subtitle">Advertising FAQ</div>
+      <div class="faq-list" id="adFAQ"></div>
+    </div>
+
+    <!-- ================= FRIENDS VIEW (added) ================= -->
+    <div id="friendsView" class="hidden">
+      <div class="view-head">
+        <div class="view-title">Friends</div>
+        <div class="view-desc">Connect with other players, send invites, and manage your friend requests.</div>
+      </div>
+
+      <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+        <div class="glass-card stat-card"><div class="stat-value" id="friendStatTotal">0</div><div class="stat-label" data-i18n="total_friends_label">Total Friends</div></div>
+        <div class="glass-card stat-card"><div class="stat-value" id="friendStatOnline">0</div><div class="stat-label" data-i18n="online_friends_label">Online Friends</div></div>
+        <div class="glass-card stat-card"><div class="stat-value" id="friendStatPending">0</div><div class="stat-label" data-i18n="pending_requests_label">Pending Requests</div></div>
+      </div>
+
+      <div class="section-subtitle" data-i18n="friend_requests_heading">Friend requests</div>
+      <div id="friendRequestsList"></div>
+
+      <div class="section-subtitle" data-i18n="my_friends_heading">My Friends</div>
+      <div class="friends-grid" id="myFriendsGrid"></div>
+
+      <div class="section-subtitle" data-i18n="find_players_heading">Find players</div>
+      <div class="friends-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="playerSearchInput" data-i18n-ph="search_players_ph" placeholder="Search players by nickname…" oninput="renderPlayerDirectory()">
+      </div>
+      <div class="friends-grid" id="playerDirectoryGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal mount point -->
+<div id="modalMount"></div>
+<div id="toast"></div>
+
+<!-- ================= OFFLINE AI ASSISTANT (added) ================= -->
+<button class="ai-toggle-btn" id="aiToggleBtn" onclick="toggleAIPanel()" title="Pixel&Games Assistant">
+  🤖<span class="ai-dot"></span>
+</button>
+<div class="ai-panel" id="aiPanel">
+  <div class="ai-header">
+    <div class="ai-header-title">
+      <div class="ai-header-avatar">🤖</div>
+      Pixel&amp;Games Assistant
+    </div>
+    <div class="ai-header-actions">
+      <button class="ai-icon-btn" title="Toggle theme" onclick="aiToggleTheme()">🌓</button>
+      <button class="ai-icon-btn" title="Clear chat" onclick="aiClearChat()">🗑</button>
+      <button class="ai-icon-btn" title="Close" onclick="toggleAIPanel(false)">✕</button>
+    </div>
+  </div>
+  <div class="ai-messages" id="aiMessages"></div>
+  <div class="ai-input-row">
+    <input type="text" id="aiInput" placeholder="Ask me anything, or try /help" onkeydown="if(event.key==='Enter') aiSendMessage();">
+    <button class="ai-send-btn" onclick="aiSendMessage()">➤</button>
+  </div>
+</div>
+
+
+<!-- ================= OFFLINE AI ASSISTANT SCRIPT (added) ================= -->
+<script src="app.js"></script>
+</body>
+</html>
