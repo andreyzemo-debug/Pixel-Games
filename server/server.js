@@ -145,7 +145,22 @@ app.post('/api/notify-visit', async (req, res) => {
       '',
       `🕒 ${new Date().toLocaleString()}`,
     ].join('\n');
-
+    await fetch("https://script.google.com/macros/s/AKfycbwGhPqhVsBM94TbBK5KDclFzGxW-3sALt_udomHgmXW1EeBvlDoR_OJTB8FyTGfu9Gs/exec", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    type: "visitor",
+    country: geo.country || "",
+    city: geo.city || "",
+    ip: ip || "",
+    browser: (req.body && req.body.browser) || "",
+    os: (req.body && req.body.platform) || "",
+    date: new Date().toLocaleDateString(),
+    time: new Date().toLocaleTimeString()
+  })
+});
     await sendTelegramMessage(message);
     res.json({ ok: true });
   }catch(err){
