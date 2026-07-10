@@ -10,6 +10,8 @@
 const TG = require("./_lib/telegram");
 
 module.exports = async (req, res) => {
+  console.log("SETUP_SECRET =", process.env.SETUP_SECRET);
+  console.log("provided =", req.query?.secret);
   const setupSecret = process.env.SETUP_SECRET;
   if (!setupSecret) {
     return res
