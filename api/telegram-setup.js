@@ -9,6 +9,9 @@
 const TG = require("./_lib/telegram");
 
 module.exports = async (req, res) => {
+  // Make sure nothing ever caches this response.
+  res.setHeader("Cache-Control", "no-store");
+
   const setupSecret = process.env.SETUP_SECRET;
 
   if (!setupSecret) {
@@ -19,7 +22,7 @@ module.exports = async (req, res) => {
 
   const provided = req.query && req.query.secret;
 
-  if (provided !== setupSecret) {
+  if (!provided || provided !== setupSecret) {
     return res.status(401).json({
       error: "Invalid or missing ?secret=",
     });

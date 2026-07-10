@@ -15,11 +15,19 @@ module.exports = async (req, res) => {
 
   const expectedSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
   if (expectedSecret) {
-    const gotSecret = req.headers["x-telegram-bot-api-secret-token"];
-    if (gotSecret !== expectedSecret) {
-      return res.status(401).json({ error: "Invalid secret token" });
-    }
+  const gotSecret = req.headers["x-telegram-bot-api-secret-token"];
+
+  console.log("Expected:", expectedSecret);
+  console.log("Received:", gotSecret);
+
+  if (gotSecret !== expectedSecret) {
+    return res.status(200).json({
+      debug: true,
+      expectedSecret,
+      gotSecret
+    });
   }
+}
 
   try {
     await handleUpdate(req.body || {});
