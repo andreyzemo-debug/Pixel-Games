@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Pixel&Games — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- ================= LOGIN SCREEN ================= -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="logo">Pixel<span>&</span>Games</div>
+    <p>Admin Panel. Sign in with the Telegram account configured as <code>TELEGRAM_ADMIN_ID</code>. Anyone else will be denied.</p>
+    <div id="telegramWidgetHost"></div>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- ================= APP SHELL ================= -->
+<div id="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">Pixel<span>&</span>Games <small style="color:var(--text-faint);font-size:11px;">/admin</small></div>
+
+    <div class="nav-item active" data-page="dashboard"><span class="ic">📊</span> Dashboard</div>
+    <div class="nav-item" data-page="users"><span class="ic">👥</span> Users</div>
+    <div class="nav-item" data-page="broadcast"><span class="ic">📢</span> Broadcast</div>
+    <div class="nav-item" data-page="games"><span class="ic">🎮</span> Games</div>
+    <div class="nav-item" data-page="news"><span class="ic">📰</span> News</div>
+    <div class="nav-item" data-page="settings"><span class="ic">⚙️</span> Settings</div>
+
+    <div class="sidebar-foot">
+      <div class="admin-chip"><span class="dot"></span><span id="adminName">—</span></div>
+      <button class="logout-btn" id="logoutBtn">Log out</button>
+    </div>
+  </aside>
+
+  <div>
+    <div class="mobile-topbar">
+      <div class="brand">Pixel<span>&</span>Games</div>
+      <button class="hamburger" id="hamburgerBtn">☰</button>
+    </div>
+
+    <main class="main">
+
+      <!-- ---------------- DASHBOARD ---------------- -->
+      <section class="page active" id="page-dashboard">
+        <div class="page-head">
+          <div><h1>Dashboard</h1><div class="sub">Live overview of Pixel&Games.</div></div>
+          <button class="btn" id="refreshDashboardBtn">🔄 Refresh</button>
+        </div>
+
+        <div class="grid-cards" id="statCards">
+          <div class="loading-state">Loading statistics…</div>
+        </div>
+
+        <div class="panel">
+          <h3>Telegram bot status</h3>
+          <div id="botStatusBox" class="loading-state">Checking…</div>
+        </div>
+
+        <div class="panel">
+          <h3>Latest activity</h3>
+          <div class="activity-list" id="activityList"><div class="loading-state">Loading…</div></div>
+        </div>
+      </section>
+
+      <!-- ---------------- USERS ---------------- -->
+      <section class="page" id="page-users">
+        <div class="page-head">
+          <div><h1>Users</h1><div class="sub">View, search, ban and delete registered users.</div></div>
+        </div>
+        <div class="toolbar">
+          <input type="search" id="userSearchInput" placeholder="Search by username, email, or ID…" style="min-width:260px;">
+          <button class="btn" id="userSearchBtn">Search</button>
+          <button class="btn" id="userClearBtn">Clear</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>User</th><th>Email</th><th>Account</th><th>Country</th><th>Registered</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" class="loading-state">Loading users…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ---------------- BROADCAST ---------------- -->
+      <section class="page" id="page-broadcast">
+        <div class="page-head">
+          <div><h1>Broadcast</h1><div class="sub">Send an announcement to every player linked to the Telegram bot.</div></div>
+        </div>
+        <div class="panel">
+          <div class="field" style="margin-bottom:14px;">
+            <label style="display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;">Message</label>
+            <textarea id="broadcastText" rows="6" placeholder="Write your announcement… Basic HTML (Telegram-flavored) is supported: <b>bold</b>, <i>italic</i>."></textarea>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="sub" id="broadcastCharCount">0 / 3500 characters</div>
+            <button class="btn primary" id="broadcastSendBtn">📢 Send broadcast</button>
+          </div>
+        </div>
+        <div class="panel" id="broadcastResultPanel" style="display:none;">
+          <h3>Last broadcast result</h3>
+          <div id="broadcastResult"></div>
+        </div>
+      </section>
+
+      <!-- ---------------- GAMES ---------------- -->
+      <section class="page" id="page-games">
+        <div class="page-head">
+          <div><h1>Games</h1><div class="sub">Manage the game catalog stored in Google Sheets.</div></div>
+          <button class="btn primary" id="addGameBtn">+ Add game</button>
+        </div>
+        <div class="card-grid" id="gamesGrid">
+          <div class="loading-state">Loading games…</div>
+        </div>
+      </section>
+
+      <!-- ---------------- NEWS ---------------- -->
+      <section class="page" id="page-news">
+        <div class="page-head">
+          <div><h1>News</h1><div class="sub">Manage announcements stored in Google Sheets.</div></div>
+          <button class="btn primary" id="addNewsBtn">+ Add news</button>
+        </div>
+        <div class="card-grid" id="newsGrid">
+          <div class="loading-state">Loading news…</div>
+        </div>
+      </section>
+
+      <!-- ---------------- SETTINGS ---------------- -->
+      <section class="page" id="page-settings">
+        <div class="page-head">
+          <div><h1>Settings</h1><div class="sub">Read-only view of server configuration. Secrets are masked.</div></div>
+        </div>
+        <div id="settingsBox"><div class="loading-state">Loading configuration…</div></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ================= MODAL (shared) ================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div id="toastHost"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>

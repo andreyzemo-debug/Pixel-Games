@@ -60,7 +60,22 @@ const Sheets = {
   setPendingBroadcast: (telegramId, text) =>
     gasPost({ type: "telegram_set_broadcast", telegramId, text }),
   clearPendingBroadcast: () =>
-    gasPost({ type: "telegram_clear_broadcast" }),
+  gasPost({ type: "telegram_clear_broadcast" }),
+
+createAdminLoginCode: (telegramId, code) =>
+  gasPost({
+    type: "admin_login_create",
+    telegramId,
+    code,
+  }),
+
+verifyAdminLoginCode: (telegramId, code) =>
+  gasPost({
+    type: "admin_login_verify",
+    telegramId,
+    code,
+  }),
 };
 
 module.exports = Sheets;
+
