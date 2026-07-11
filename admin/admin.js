@@ -5,16 +5,16 @@
    ============================================================ */
 
 const API = {
-  session: "/api/admin/session",
-  login: "/api/admin/login",
-  logout: "/api/admin/logout",
-  botInfo: "/api/admin/bot-info",
-  stats: "/api/admin/stats",
-  users: "/api/admin/users",
-  broadcast: "/api/admin/broadcast",
-  games: "/api/admin/games",
-  news: "/api/admin/news",
-  settings: "/api/admin/settings",
+  session: "/api/admin?action=session",
+  login: "/api/admin?action=login",
+  logout: "/api/admin?action=logout",
+  botInfo: "/api/admin?action=bot-info",
+  stats: "/api/admin?action=stats",
+  users: "/api/admin?action=users",
+  broadcast: "/api/admin?action=broadcast",
+  games: "/api/admin?action=games",
+  news: "/api/admin?action=news",
+  settings: "/api/admin?action=settings",
 };
 
 /* ------------------------------------------------------------
