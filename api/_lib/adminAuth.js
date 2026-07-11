@@ -1,57 +1,90 @@
+/* ============================================================
+   Pixel&Games — Admin session helper
+   Stateless, HMAC-signed session cookie. No database/session
+   store needed (fits the serverless/Vercel deployment model).
+   ============================================================ */
+
 const crypto = require("crypto");
 
-const SECRET = process.env.ADMIN_SESSION_SECRET;
 const COOKIE_NAME = "admin_session";
-const EXPIRES = 24 * 60 * 60 * 1000;
+const SESSION_TTL_SECONDS = 12 * 60 * 60; // 12 hours
 
-function createSessionToken(adminId, profile = {}) {
-  const expires = Date.now() + EXPIRES;
+function getSecret() {
+  const secret = process.env.ADMIN_SESSION_SECRET;
+  if (!secret) {
+    throw new Error("ADMIN_SESSION_SECRET is not configured on the server");
+  }
+  return secret;
+}
 
-  const payload = JSON.stringify({
-    adminId,
-    profile,
-    expires,
-  });
+function b64url(input) {
+  return Buffer.from(input)
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
 
-  const payload64 = Buffer.from(payload).toString("base64url");
+function b64urlDecode(input) {
+  const pad = input.length % 4 === 0 ? "" : "=".repeat(4 - (input.length % 4));
+  const base64 = input.replace(/-/g, "+").replace(/_/g, "/") + pad;
+  return Buffer.from(base64, "base64").toString("utf8");
+}
 
-  const signature = crypto
-    .createHmac("sha256", SECRET)
-    .update(payload64)
-    .digest("hex");
+function sign(payloadB64, secret) {
+  return b64url(crypto.createHmac("sha256", secret).update(payloadB64).digest());
+}
 
-  return `${payload64}.${signature}`;
+function createSessionToken(adminId, extra = {}) {
+  const secret = getSecret();
+  const payload = {
+    id: String(adminId),
+    iat: Math.floor(Date.now() / 1000),
+    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
+    ...extra,
+  };
+  const payloadB64 = b64url(JSON.stringify(payload));
+  const sig = sign(payloadB64, secret);
+  return `${payloadB64}.${sig}`;
 }
 
 function verifySessionToken(token) {
-  if (!SECRET || !token) return null;
+  if (!token || typeof token !== "string" || !token.includes(".")) return null;
+  let secret;
+  try {
+    secret = getSecret();
+  } catch {
+    return null;
+  }
 
-  const parts = token.split(".");
-  if (parts.length !== 2) return null;
+  const [payloadB64, sig] = token.split(".");
+  if (!payloadB64 || !sig) return null;
 
-  const payload64 = parts[0];
-  const signature = parts[1];
+  const expectedSig = sign(payloadB64, secret);
+  const a = Buffer.from(sig);
+  const b = Buffer.from(expectedSig);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
 
-  const expected = crypto
-    .createHmac("sha256", SECRET)
-    .update(payload64)
-    .digest("hex");
+  let payload;
+  try {
+    payload = JSON.parse(b64urlDecode(payloadB64));
+  } catch {
+    return null;
+  }
 
-  if (signature !== expected) return null;
+  if (!payload || typeof payload.exp !== "number") return null;
+  if (Math.floor(Date.now() / 1000) > payload.exp) return null;
 
-  const data = JSON.parse(
-    Buffer.from(payload64, "base64url").toString("utf8")
-  );
+  const adminId = String(process.env.TELEGRAM_ADMIN_ID || "");
+  if (!adminId || payload.id !== adminId) return null;
 
-  if (Date.now() > data.expires) return null;
-
-  return data;
+  return payload;
 }
 
 function setSessionCookie(res, token) {
   res.setHeader(
     "Set-Cookie",
-    `${COOKIE_NAME}=${token}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=86400`
+    `${COOKIE_NAME}=${encodeURIComponent(token)}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=${SESSION_TTL_SECONDS}`
   );
 }
 
@@ -62,9 +95,51 @@ function clearSessionCookie(res) {
   );
 }
 
+/* ------------------------------------------------------------
+   readSession(req)
+   Reads the admin_session cookie from the incoming request and
+   returns the verified session payload, or null if missing,
+   malformed, expired, tampered, or not the configured admin.
+   ------------------------------------------------------------ */
+function readSession(req) {
+  const header = (req.headers && req.headers.cookie) || "";
+  let token = null;
+  header.split(";").some((pair) => {
+    const idx = pair.indexOf("=");
+    if (idx === -1) return false;
+    const key = pair.slice(0, idx).trim();
+    if (key === COOKIE_NAME) {
+      token = decodeURIComponent(pair.slice(idx + 1).trim());
+      return true;
+    }
+    return false;
+  });
+  return verifySessionToken(token);
+}
+
+/* ------------------------------------------------------------
+   requireAdmin(req, res)
+   Guard used by every protected admin action:
+     const admin = requireAdmin(req, res);
+     if (!admin) return; // 401 response already sent
+   Returns the session object on success.
+   ------------------------------------------------------------ */
+function requireAdmin(req, res) {
+  const session = readSession(req);
+  if (!session) {
+    res.status(401).json({ ok: false, error: "unauthorized" });
+    return null;
+  }
+  return session;
+}
+
 module.exports = {
+  COOKIE_NAME,
+  SESSION_TTL_SECONDS,
   createSessionToken,
   verifySessionToken,
   setSessionCookie,
   clearSessionCookie,
+  readSession,
+  requireAdmin,
 };
