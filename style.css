@@ -396,6 +396,8 @@
   .user-dropdown-menu .side-user-mail{
     font-size:11px; color:var(--text-faint); font-family:var(--font-mono); word-break:break-all; margin-bottom:2px;
   }
+  /* ================= ADMIN PANEL LINK divider (added) ================= */
+  .user-menu-divider{ height:1px; background:var(--line); margin:2px 0; }
   .btn-ghost{
     width:100%; background:var(--surface); color:var(--text-muted); font-size:12px;
     padding:9px 0; border-radius:7px; border:1px solid var(--line); transition:all .15s;
