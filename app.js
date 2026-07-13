@@ -34,7 +34,6 @@ const I18N = {
     nav_friends: "Friends",
     nav_partnership: "Partnership",
     nav_ads: "Advertisements",
-    nav_admin_panel: "🛠 Admin Panel",
     btn_logout: "Log Out",
 
     // ADDED — expanded translation coverage
@@ -188,7 +187,6 @@ const I18N = {
     nav_friends: "Друзья",
     nav_partnership: "Партнёрство",
     nav_ads: "Реклама",
-    nav_admin_panel: "🛠 Админ-панель",
     btn_logout: "Выйти",
 
     // ADDED — expanded translation coverage
@@ -342,7 +340,6 @@ const I18N = {
     nav_friends: "Do'stlar",
     nav_partnership: "Hamkorlik",
     nav_ads: "Reklama",
-    nav_admin_panel: "🛠 Admin panel",
     btn_logout: "Chiqish",
 
     // ADDED — expanded translation coverage
@@ -759,38 +756,6 @@ function closeUserMenu() {
   const btn = document.getElementById("topnavUser");
   if (menu) menu.classList.add("hidden");
   if (btn) btn.setAttribute("aria-expanded", "false");
-}
-
-/* ============================================================
-   ADDED — TOP NAV: Admin Panel link in the profile dropdown
-   Shown only when the backend confirms an authenticated admin
-   session via the existing GET /api/admin?action=session
-   endpoint (signed HttpOnly session cookie). Never trusts any
-   frontend value — if the request fails or returns
-   authenticated:false, the item stays hidden.
-   ============================================================ */
-function setAdminPanelMenuVisible(visible) {
-  const item = document.getElementById("adminPanelMenuItem");
-  const divider = document.getElementById("adminPanelDivider");
-  if (item) item.classList.toggle("hidden", !visible);
-  if (divider) divider.classList.toggle("hidden", !visible);
-}
-
-function checkAdminSession() {
-  fetch("/api/admin?action=session")
-    .then((res) => res.json())
-    .then((data) => {
-      setAdminPanelMenuVisible(!!(data && data.authenticated));
-    })
-    .catch(() => {
-      // Request failed — treat the user as a normal (non-admin) user.
-      setAdminPanelMenuVisible(false);
-    });
-}
-
-function openAdminPanel() {
-  closeUserMenu();
-  window.location.href = "/admin/";
 }
 
 // Close any open dropdown when clicking outside of it, and on ESC.
@@ -1908,7 +1873,6 @@ function recordActivity(type) {
 
 function logout() {
   clearSession();
-  setAdminPanelMenuVisible(false);
   document.getElementById("appShell").classList.add("hidden");
   document.getElementById("authScreen").classList.remove("hidden");
   document.getElementById("loginForm").reset();
@@ -2093,7 +2057,6 @@ function enterApp() {
   syncSiteAccentFromUser();
   renderCoinsBadge();
   restoreActiveSessionIfAny();
-  checkAdminSession();
   switchView("store");
 }
 
