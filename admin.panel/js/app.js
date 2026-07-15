@@ -1,0 +1,385 @@
+/* ============================================================
+   Pixel&Games — Control Room
+   js/app.js — boot sequence, auth, navigation, palette, theming
+   ============================================================ */
+
+const pageLoaders = {
+  dashboard: Pages.dashboard,
+  analytics: Pages.analytics,
+  users: () => Pages.users(),
+  games: Pages.games,
+  news: Pages.news,
+  broadcast: () => {},
+  settings: Pages.settings,
+  profile: Pages.profile,
+};
+
+const PALETTE_PAGES = [
+  { page: "dashboard", label: "Dashboard", hint: "Overview" },
+  { page: "analytics", label: "Analytics", hint: "Overview" },
+  { page: "users", label: "Users", hint: "Manage" },
+  { page: "games", label: "Games", hint: "Manage" },
+  { page: "news", label: "News", hint: "Manage" },
+  { page: "broadcast", label: "Broadcast", hint: "Manage" },
+  { page: "settings", label: "Settings", hint: "System" },
+  { page: "profile", label: "Profile", hint: "System" },
+];
+const PALETTE_ACTIONS = [
+  { label: "Add a game", hint: "Games", run: () => { goToPage("games"); setTimeout(() => document.getElementById("addGameBtn")?.click(), 150); } },
+  { label: "Publish news", hint: "News", run: () => { goToPage("news"); setTimeout(() => document.getElementById("addNewsBtn")?.click(), 150); } },
+  { label: "Send a broadcast", hint: "Broadcast", run: () => { goToPage("broadcast"); setTimeout(() => document.getElementById("broadcastText")?.focus(), 150); } },
+  { label: "Search users", hint: "Users", run: () => { goToPage("users"); setTimeout(() => document.getElementById("userSearchInput")?.focus(), 150); } },
+  { label: "Log out", hint: "Session", run: () => doLogout() },
+];
+
+let currentPage = "dashboard";
+
+/* ------------------------------------------------------------
+   Auth gate <-> app shell
+   ------------------------------------------------------------ */
+function showLogin(errorMsg) {
+  document.getElementById("appShell").classList.remove("show");
+  document.getElementById("authGate").style.display = "flex";
+  const errBox = document.getElementById("authError");
+  if (errorMsg) {
+    errBox.textContent = errorMsg;
+    errBox.classList.add("show");
+  } else {
+    errBox.classList.remove("show");
+  }
+}
+
+function showApp(admin) {
+  currentAdmin = admin;
+  sessionSignedInAt = Date.now();
+  document.getElementById("authGate").style.display = "none";
+  document.getElementById("appShell").classList.add("show");
+
+  const name = admin.name || "Admin";
+  const initialsStr = initials(name);
+  document.getElementById("footAvatar").textContent = initialsStr;
+  document.getElementById("footName").textContent = name;
+  document.getElementById("topAvatar").textContent = initialsStr;
+
+  goToPage("dashboard", { silent: true });
+  pageLoaders.dashboard();
+}
+
+function onUnauthorized() {
+  showLogin("Your session expired. Please sign in again.");
+  initTelegramWidget();
+}
+
+/* ------------------------------------------------------------
+   Telegram Login Widget
+   ------------------------------------------------------------ */
+window.onTelegramAuth = async function (user) {
+  try {
+    const data = await api(API.login, { method: "POST", body: JSON.stringify(user) });
+    toast(`Welcome back, ${data.admin.name}.`);
+    showApp(data.admin);
+  } catch (err) {
+    showLogin(err.message || "Login failed.");
+  }
+};
+
+async function initTelegramWidget() {
+  const host = document.getElementById("telegramWidgetHost");
+  const statusDot = document.getElementById("authApiStatus");
+  const statusLabel = document.getElementById("authApiStatusLabel");
+  try {
+    const info = await api(API.botInfo);
+    statusDot.dataset.state = "ok";
+    statusLabel.textContent = "Backend connected";
+
+    host.innerHTML = "";
+    const script = document.createElement("script");
+    script.src = "https://telegram.org/js/telegram-widget.js?22";
+    script.async = true;
+    script.setAttribute("data-telegram-login", info.username);
+    script.setAttribute("data-size", "large");
+    script.setAttribute("data-radius", "10");
+    script.setAttribute("data-onauth", "onTelegramAuth(user)");
+    script.setAttribute("data-request-access", "write");
+    host.appendChild(script);
+  } catch (err) {
+    statusDot.dataset.state = "error";
+    statusLabel.textContent = "Backend unreachable";
+    host.innerHTML = `<div class="empty-state">Couldn't load Telegram login (${escapeHtml(err.message)}). Check TELEGRAM_BOT_TOKEN and that this panel is deployed on the same domain as the Site backend.</div>`;
+  }
+}
+
+async function doLogout() {
+  try {
+    await api(API.logout, { method: "POST" });
+  } catch {}
+  currentAdmin = null;
+  location.reload();
+}
+
+async function checkSession() {
+  try {
+    const data = await api(API.session);
+    if (data.authenticated) {
+      showApp(data.admin);
+    } else {
+      showLogin();
+      initTelegramWidget();
+    }
+  } catch {
+    showLogin();
+    initTelegramWidget();
+  }
+}
+
+/* ------------------------------------------------------------
+   Navigation
+   ------------------------------------------------------------ */
+function goToPage(page, opts = {}) {
+  if (!document.getElementById(`page-${page}`)) return;
+  currentPage = page;
+
+  document.querySelectorAll(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.page === page));
+  document.querySelectorAll(".page").forEach((p) => p.classList.toggle("active", p.id === `page-${page}`));
+
+  const section = document.getElementById(`page-${page}`);
+  document.getElementById("crumbPage").textContent = section.dataset.title || page;
+
+  document.getElementById("appShell").classList.remove("mobile-nav-open");
+  positionNavIndicator();
+
+  if (!opts.silent && pageLoaders[page]) pageLoaders[page]();
+}
+
+function positionNavIndicator() {
+  const indicator = document.getElementById("navIndicator");
+  const active = document.querySelector(".nav-item.active");
+  const nav = document.getElementById("sidebarNav");
+  if (!indicator || !active || !nav) return;
+  const navRect = nav.getBoundingClientRect();
+  const itemRect = active.getBoundingClientRect();
+  indicator.style.height = `${itemRect.height}px`;
+  indicator.style.transform = `translateY(${itemRect.top - navRect.top + nav.scrollTop}px)`;
+}
+
+document.querySelectorAll(".nav-item").forEach((item) => {
+  item.addEventListener("click", () => goToPage(item.dataset.page));
+});
+document.getElementById("footProfileBtn").addEventListener("click", () => goToPage("profile"));
+document.getElementById("topbarAvatarBtn").addEventListener("click", () => goToPage("profile"));
+window.addEventListener("resize", positionNavIndicator);
+
+/* ------------------------------------------------------------
+   Sidebar: mobile toggle + collapse
+   ------------------------------------------------------------ */
+document.getElementById("hamburgerBtn").addEventListener("click", () => {
+  document.getElementById("appShell").classList.toggle("mobile-nav-open");
+});
+document.getElementById("sidebarScrim").addEventListener("click", () => {
+  document.getElementById("appShell").classList.remove("mobile-nav-open");
+});
+document.getElementById("sidebarCollapseBtn").addEventListener("click", () => {
+  document.getElementById("appShell").classList.toggle("sidebar-collapsed");
+  localStorage.setItem("cr_sidebar_collapsed", document.getElementById("appShell").classList.contains("sidebar-collapsed") ? "1" : "0");
+  setTimeout(positionNavIndicator, 260);
+});
+if (localStorage.getItem("cr_sidebar_collapsed") === "1") {
+  document.getElementById("appShell").classList.add("sidebar-collapsed");
+}
+document.getElementById("profileSidebarBtn")?.addEventListener("click", () => {
+  document.getElementById("sidebarCollapseBtn").click();
+});
+
+/* ------------------------------------------------------------
+   Theme toggle (dark / light) — persisted
+   ------------------------------------------------------------ */
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  localStorage.setItem("cr_theme", theme);
+}
+function toggleTheme() {
+  applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
+}
+document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
+document.getElementById("profileThemeBtn")?.addEventListener("click", toggleTheme);
+applyTheme(localStorage.getItem("cr_theme") || "dark");
+
+/* ------------------------------------------------------------
+   Refresh button
+   ------------------------------------------------------------ */
+document.getElementById("refreshBtn").addEventListener("click", (e) => {
+  e.currentTarget.classList.add("spin");
+  setTimeout(() => e.currentTarget.classList.remove("spin"), 600);
+  if (pageLoaders[currentPage]) pageLoaders[currentPage]();
+});
+
+/* ------------------------------------------------------------
+   Command palette
+   ------------------------------------------------------------ */
+const paletteOverlay = document.getElementById("paletteOverlay");
+const paletteInput = document.getElementById("paletteInput");
+const paletteResults = document.getElementById("paletteResults");
+let paletteSelIndex = 0;
+let paletteFlatItems = [];
+
+function openPalette() {
+  paletteOverlay.classList.add("show");
+  paletteInput.value = "";
+  renderPaletteResults("");
+  setTimeout(() => paletteInput.focus(), 30);
+}
+function closePalette() {
+  paletteOverlay.classList.remove("show");
+}
+function renderPaletteResults(query) {
+  const q = query.trim().toLowerCase();
+  const pages = PALETTE_PAGES.filter((p) => p.label.toLowerCase().includes(q));
+  const actions = PALETTE_ACTIONS.filter((a) => a.label.toLowerCase().includes(q));
+
+  paletteFlatItems = [];
+  let html = "";
+
+  if (pages.length) {
+    html += `<div class="palette-group-label">Pages</div>`;
+    pages.forEach((p) => {
+      paletteFlatItems.push({ type: "page", ...p });
+      html += `<div class="palette-item" data-idx="${paletteFlatItems.length - 1}"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>${escapeHtml(p.label)}</span><span class="hint">${escapeHtml(p.hint)}</span></div>`;
+    });
+  }
+  if (actions.length) {
+    html += `<div class="palette-group-label">Actions</div>`;
+    actions.forEach((a) => {
+      paletteFlatItems.push({ type: "action", ...a });
+      html += `<div class="palette-item" data-idx="${paletteFlatItems.length - 1}"><svg class="ic" viewBox="0 0 24 24"><path d="M13 3L5 13h5l-1 8 9-11h-6z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>${escapeHtml(a.label)}</span><span class="hint">${escapeHtml(a.hint)}</span></div>`;
+    });
+  }
+  if (!pages.length && !actions.length) {
+    html = `<div class="empty-state">No matches.</div>`;
+  }
+  paletteResults.innerHTML = html;
+  paletteSelIndex = 0;
+  highlightPaletteSel();
+
+  paletteResults.querySelectorAll(".palette-item").forEach((el) => {
+    el.addEventListener("click", () => runPaletteItem(Number(el.dataset.idx)));
+    el.addEventListener("mouseenter", () => {
+      paletteSelIndex = Number(el.dataset.idx);
+      highlightPaletteSel();
+    });
+  });
+}
+function highlightPaletteSel() {
+  paletteResults.querySelectorAll(".palette-item").forEach((el) => {
+    el.classList.toggle("sel", Number(el.dataset.idx) === paletteSelIndex);
+  });
+  const sel = paletteResults.querySelector(".palette-item.sel");
+  if (sel) sel.scrollIntoView({ block: "nearest" });
+}
+function runPaletteItem(idx) {
+  const item = paletteFlatItems[idx];
+  if (!item) return;
+  closePalette();
+  if (item.type === "page") goToPage(item.page);
+  if (item.type === "action") item.run();
+}
+
+document.getElementById("openPaletteBtn").addEventListener("click", openPalette);
+document.getElementById("openPaletteBtnTop").addEventListener("click", openPalette);
+paletteOverlay.addEventListener("click", (e) => { if (e.target === paletteOverlay) closePalette(); });
+paletteInput.addEventListener("input", (e) => renderPaletteResults(e.target.value));
+paletteInput.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowDown") { e.preventDefault(); paletteSelIndex = Math.min(paletteSelIndex + 1, paletteFlatItems.length - 1); highlightPaletteSel(); }
+  if (e.key === "ArrowUp") { e.preventDefault(); paletteSelIndex = Math.max(paletteSelIndex - 1, 0); highlightPaletteSel(); }
+  if (e.key === "Enter") { e.preventDefault(); runPaletteItem(paletteSelIndex); }
+  if (e.key === "Escape") closePalette();
+});
+document.addEventListener("keydown", (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+    e.preventDefault();
+    if (document.getElementById("appShell").classList.contains("show")) openPalette();
+  }
+});
+
+/* ------------------------------------------------------------
+   Users page controls
+   ------------------------------------------------------------ */
+document.getElementById("userSearchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") Pages.users(e.target.value.trim());
+});
+document.getElementById("userSearchInput").addEventListener("input", debounce((e) => Pages.users(e.target.value.trim()), 400));
+document.getElementById("userLimitSelect").addEventListener("change", () => Pages.users());
+document.getElementById("userClearBtn").addEventListener("click", () => {
+  document.getElementById("userSearchInput").value = "";
+  Pages.users("");
+});
+
+function debounce(fn, wait) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), wait);
+  };
+}
+
+/* ------------------------------------------------------------
+   Games / News "add" buttons
+   ------------------------------------------------------------ */
+document.getElementById("addGameBtn").addEventListener("click", () => openGameForm(null));
+document.getElementById("addNewsBtn").addEventListener("click", () => openNewsForm(null));
+
+/* ------------------------------------------------------------
+   Broadcast wiring
+   ------------------------------------------------------------ */
+const broadcastText = document.getElementById("broadcastText");
+const broadcastPreviewBody = document.getElementById("broadcastPreviewBody");
+broadcastText.addEventListener("input", () => {
+  document.getElementById("broadcastCharCount").textContent = `${broadcastText.value.length} / 3500`;
+  broadcastPreviewBody.textContent = broadcastText.value.trim() || "Your message will appear here.";
+});
+
+document.getElementById("broadcastSendBtn").addEventListener("click", () => {
+  const message = broadcastText.value.trim();
+  if (!message) {
+    toast("Write a message first.", "error");
+    return;
+  }
+  confirmDialog({
+    title: "Send broadcast",
+    message: "This sends the message to every player linked to the Telegram bot right now. Continue?",
+    confirmLabel: "Send",
+    onConfirm: async () => {
+      const data = await api(API.broadcast, { method: "POST", body: JSON.stringify({ message }) });
+      const panel = document.getElementById("broadcastResultPanel");
+      panel.style.display = "block";
+      document.getElementById("broadcastResult").innerHTML = `
+        <div class="settings-row"><div class="key">Sent</div><div class="val on">${data.sent}</div></div>
+        <div class="settings-row"><div class="key">Failed</div><div class="val ${data.failed ? "off" : ""}">${data.failed}</div></div>
+        <div class="settings-row"><div class="key">Total recipients</div><div class="val">${data.total}</div></div>
+        ${data.capped ? `<div class="settings-row"><div class="key">Note</div><div class="val off">Capped at 200 — run it again to reach the rest.</div></div>` : ""}
+      `;
+      toast(`Broadcast sent to ${data.sent}/${data.total} player(s).`);
+      broadcastText.value = "";
+      document.getElementById("broadcastCharCount").textContent = "0 / 3500";
+      broadcastPreviewBody.textContent = "Your message will appear here.";
+    },
+  });
+});
+
+/* ------------------------------------------------------------
+   Profile: logout
+   ------------------------------------------------------------ */
+document.getElementById("logoutBtn").addEventListener("click", () => {
+  confirmDialog({
+    title: "Log out",
+    message: "You'll need to sign in with Telegram again to come back to the Control Room.",
+    confirmLabel: "Log out",
+    danger: true,
+    onConfirm: doLogout,
+  });
+});
+
+/* ------------------------------------------------------------
+   Boot
+   ------------------------------------------------------------ */
+checkSession();

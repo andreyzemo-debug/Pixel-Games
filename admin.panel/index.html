@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Control Room — Pixel&amp;Games Admin</title>
+<meta name="theme-color" content="#0A0E14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+<!-- ======================= AUTH GATE ======================= -->
+<div id="authGate" class="auth-gate">
+  <div class="auth-bg" aria-hidden="true">
+    <div class="auth-grid"></div>
+    <div class="auth-glow auth-glow-a"></div>
+    <div class="auth-glow auth-glow-b"></div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-mark">
+      <span class="auth-mark-glyph">P&amp;G</span>
+    </div>
+    <div class="auth-heading">
+      <h1>Control Room</h1>
+      <p>Admin access for <strong>Pixel&amp;Games</strong>. Sign in with the Telegram account on file. Every other account is turned away at the door.</p>
+    </div>
+
+    <div id="telegramWidgetHost" class="auth-widget-host">
+      <div class="auth-widget-loading">
+        <span class="spinner" aria-hidden="true"></span> Connecting to Telegram…
+      </div>
+    </div>
+
+    <div class="auth-error" id="authError" role="alert"></div>
+
+    <div class="auth-foot">
+      <span class="dot-status" id="authApiStatus" data-state="checking"></span>
+      <span id="authApiStatusLabel">Checking backend…</span>
+    </div>
+  </div>
+
+  <div class="auth-footer-note">Session cookies are HttpOnly and signed · 12h expiry · no data leaves your Site's own backend</div>
+</div>
+
+<!-- ======================= APP SHELL ======================= -->
+<div id="appShell" class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-mark">P&amp;G</div>
+      <div class="brand-text">
+        <span class="brand-name">Control Room</span>
+        <span class="brand-sub">Pixel&amp;Games / admin</span>
+      </div>
+      <button class="sidebar-collapse-btn" id="sidebarCollapseBtn" title="Collapse sidebar" aria-label="Collapse sidebar">
+        <svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <button class="sidebar-search" id="openPaletteBtn">
+      <svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Quick jump</span>
+      <kbd>⌘K</kbd>
+    </button>
+
+    <nav class="sidebar-nav" id="sidebarNav">
+      <div class="nav-section-label">Overview</div>
+      <button class="nav-item active" data-page="dashboard">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-page="analytics">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M4 19V10M11 19V4M18 19v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Analytics</span>
+      </button>
+
+      <div class="nav-section-label">Manage</div>
+      <button class="nav-item" data-page="users">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="18" cy="8" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15.5 14.3c2.9.4 5 2.9 5 5.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Users</span>
+      </button>
+      <button class="nav-item" data-page="games">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="11" rx="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 10.5v4M5.5 12.5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="16" cy="11" r="1" fill="currentColor"/><circle cx="18.2" cy="13.5" r="1" fill="currentColor"/></svg>
+        <span>Games</span>
+      </button>
+      <button class="nav-item" data-page="news">
+        <svg class="ic" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7 8.5h10M7 12h10M7 15.5h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>News</span>
+      </button>
+      <button class="nav-item" data-page="broadcast">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M3 11v2a2 2 0 002 2h1l4 4v-12l-4 4H5a2 2 0 00-2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 8.5a5 5 0 010 7M19 5.5a9 9 0 010 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Broadcast</span>
+      </button>
+
+      <div class="nav-section-label">System</div>
+      <button class="nav-item" data-page="settings">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 13a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6V19a2 2 0 11-4 0v-.2a1.7 1.7 0 00-1-1.5 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.6-1H4a2 2 0 110-4h.2a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.9.3H10a1.7 1.7 0 001-1.6V4a2 2 0 114 0v.2a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.9V10a1.7 1.7 0 001.6 1H20a2 2 0 110 4h-.2a1.7 1.7 0 00-1.6 1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span>Settings</span>
+      </button>
+      <button class="nav-item" data-page="profile">
+        <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 20c0-4.4 3.6-8 8-8s8 3.6 8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Profile</span>
+      </button>
+
+      <div class="nav-indicator" id="navIndicator" aria-hidden="true"></div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="bot-pulse" id="botPulseChip" data-state="unknown">
+        <span class="pulse-dot"></span>
+        <span class="pulse-label">Bot status</span>
+      </div>
+      <button class="theme-toggle" id="themeToggleBtn" title="Toggle theme" aria-label="Toggle theme">
+        <svg class="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <svg class="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 1010.5 10.5z" fill="currentColor"/></svg>
+      </button>
+      <div class="foot-profile" id="footProfileBtn" data-page="profile">
+        <span class="foot-avatar" id="footAvatar">A</span>
+        <span class="foot-name-wrap">
+          <span class="foot-name" id="footName">Admin</span>
+          <span class="foot-role">Administrator</span>
+        </span>
+      </div>
+    </div>
+  </aside>
+
+  <div class="sidebar-scrim" id="sidebarScrim"></div>
+
+  <!-- Main column -->
+  <div class="main-col">
+
+    <header class="topbar">
+      <button class="hamburger" id="hamburgerBtn" aria-label="Open menu">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+
+      <div class="topbar-crumb">
+        <span id="crumbPage">Dashboard</span>
+      </div>
+
+      <button class="topbar-search" id="openPaletteBtnTop">
+        <svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span>Search actions, users, pages…</span>
+        <kbd>⌘K</kbd>
+      </button>
+
+      <div class="topbar-actions">
+        <button class="icon-btn" id="refreshBtn" title="Refresh current page" aria-label="Refresh">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M4 12a8 8 0 0113.7-5.7L20 8M20 4v4h-4M20 12a8 8 0 01-13.7 5.7L4 16M4 20v-4h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="topbar-avatar" id="topbarAvatarBtn">
+          <span id="topAvatar">A</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="main" id="main">
+
+      <!-- ================= DASHBOARD ================= -->
+      <section class="page active" id="page-dashboard" data-title="Dashboard">
+        <div class="page-head">
+          <div>
+            <h1>Dashboard</h1>
+            <p class="page-sub">Live pulse of Pixel&amp;Games — players, visitors and the bot, in one place.</p>
+          </div>
+          <div class="page-head-actions">
+            <span class="live-chip" id="lastUpdatedChip">Live</span>
+          </div>
+        </div>
+
+        <div class="stat-grid" id="statGrid">
+          <div class="skeleton-card"></div><div class="skeleton-card"></div>
+          <div class="skeleton-card"></div><div class="skeleton-card"></div>
+        </div>
+
+        <div class="dash-grid">
+          <div class="panel span-2">
+            <div class="panel-head">
+              <h3>Audience split</h3>
+              <span class="panel-sub">Premium vs. free, right now</span>
+            </div>
+            <div id="audienceChartHost" class="chart-host"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Telegram bot</h3>
+              <span class="panel-sub">Webhook &amp; delivery health</span>
+            </div>
+            <div id="botStatusBox" class="bot-status-box loading-state">Checking…</div>
+          </div>
+
+          <div class="panel span-2">
+            <div class="panel-head">
+              <h3>Latest activity</h3>
+              <span class="panel-sub">Registrations &amp; visits, merged</span>
+            </div>
+            <div class="activity-list" id="activityList"><div class="loading-state">Loading…</div></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Top signals</h3>
+              <span class="panel-sub">Where your audience is</span>
+            </div>
+            <div id="topSignalsBox" class="top-signals loading-state">Loading…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ANALYTICS ================= -->
+      <section class="page" id="page-analytics" data-title="Analytics">
+        <div class="page-head">
+          <div>
+            <h1>Analytics</h1>
+            <p class="page-sub">A deeper read on today vs. all-time, and who's showing up.</p>
+          </div>
+        </div>
+
+        <div class="analytics-grid" id="analyticsGrid">
+          <div class="loading-state">Loading analytics…</div>
+        </div>
+      </section>
+
+      <!-- ================= USERS ================= -->
+      <section class="page" id="page-users" data-title="Users">
+        <div class="page-head">
+          <div>
+            <h1>Users</h1>
+            <p class="page-sub">Search, ban, unban or permanently remove registered players.</p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="search" id="userSearchInput" placeholder="Search by username, email, or ID…">
+          </div>
+          <select id="userLimitSelect" class="select-field">
+            <option value="50">50 rows</option>
+            <option value="100">100 rows</option>
+            <option value="200" selected>200 rows</option>
+            <option value="500">500 rows</option>
+          </select>
+          <button class="btn" id="userClearBtn">Clear</button>
+          <span class="toolbar-count" id="userCount"></span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Player</th><th>Email</th><th>Plan</th><th>Country</th><th>Registered</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <tr><td colspan="7" class="loading-state">Loading users…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ================= GAMES ================= -->
+      <section class="page" id="page-games" data-title="Games">
+        <div class="page-head">
+          <div>
+            <h1>Games</h1>
+            <p class="page-sub">The catalog your players browse in the Store.</p>
+          </div>
+          <button class="btn primary" id="addGameBtn">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Add game
+          </button>
+        </div>
+        <div class="card-grid" id="gamesGrid">
+          <div class="loading-state">Loading games…</div>
+        </div>
+      </section>
+
+      <!-- ================= NEWS ================= -->
+      <section class="page" id="page-news" data-title="News">
+        <div class="page-head">
+          <div>
+            <h1>News</h1>
+            <p class="page-sub">Announcements shown on the site's News feed.</p>
+          </div>
+          <button class="btn primary" id="addNewsBtn">
+            <svg viewBox="0 0 24 24" width="15" height="15"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+            Add news
+          </button>
+        </div>
+        <div class="card-grid" id="newsGrid">
+          <div class="loading-state">Loading news…</div>
+        </div>
+      </section>
+
+      <!-- ================= BROADCAST ================= -->
+      <section class="page" id="page-broadcast" data-title="Broadcast">
+        <div class="page-head">
+          <div>
+            <h1>Broadcast</h1>
+            <p class="page-sub">Send a message to every player linked to the Telegram bot.</p>
+          </div>
+        </div>
+
+        <div class="broadcast-layout">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Compose</h3>
+              <span class="panel-sub">Telegram HTML supported: &lt;b&gt;, &lt;i&gt;</span>
+            </div>
+            <textarea id="broadcastText" rows="9" placeholder="Write your announcement…" maxlength="3500"></textarea>
+            <div class="broadcast-toolbar">
+              <span class="char-count" id="broadcastCharCount">0 / 3500</span>
+              <button class="btn primary" id="broadcastSendBtn">
+                <svg viewBox="0 0 24 24" width="15" height="15"><path d="M3 11v2a2 2 0 002 2h1l4 4v-12l-4 4H5a2 2 0 00-2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 8.5a5 5 0 010 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Send broadcast
+              </button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Preview</h3>
+              <span class="panel-sub">How it lands in Telegram</span>
+            </div>
+            <div class="tg-preview">
+              <div class="tg-bubble">
+                <div class="tg-bubble-head">📢 Pixel&amp;Games</div>
+                <div class="tg-bubble-body" id="broadcastPreviewBody">Your message will appear here.</div>
+                <div class="tg-bubble-time">now</div>
+              </div>
+            </div>
+            <div class="panel" id="broadcastResultPanel" style="display:none;">
+              <h3 style="margin-bottom:10px;">Last result</h3>
+              <div id="broadcastResult"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= SETTINGS ================= -->
+      <section class="page" id="page-settings" data-title="Settings">
+        <div class="page-head">
+          <div>
+            <h1>Settings</h1>
+            <p class="page-sub">Read-only view of the server configuration. Secrets stay masked.</p>
+          </div>
+        </div>
+        <div id="settingsBox"><div class="loading-state">Loading configuration…</div></div>
+      </section>
+
+      <!-- ================= PROFILE ================= -->
+      <section class="page" id="page-profile" data-title="Profile">
+        <div class="page-head">
+          <div>
+            <h1>Profile</h1>
+            <p class="page-sub">Your admin session, at a glance.</p>
+          </div>
+        </div>
+
+        <div class="profile-grid">
+          <div class="panel profile-card">
+            <div class="profile-avatar" id="profileAvatar">A</div>
+            <div class="profile-name" id="profileName">Admin</div>
+            <div class="profile-username" id="profileUsername">@—</div>
+            <div class="profile-id-row">
+              <span>Telegram ID</span>
+              <code id="profileId">—</code>
+            </div>
+            <button class="btn danger full" id="logoutBtn">Log out</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Session</h3></div>
+            <div class="settings-row"><div class="key">Status</div><div class="val on">Active</div></div>
+            <div class="settings-row"><div class="key">Signed in</div><div class="val" id="sessionSignedIn">—</div></div>
+            <div class="settings-row"><div class="key">Expires</div><div class="val" id="sessionExpires">—</div></div>
+            <div class="settings-row"><div class="key">Cookie</div><div class="val">HttpOnly, Secure, SameSite=Lax</div></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head"><h3>Preferences</h3></div>
+            <div class="settings-row">
+              <div class="key">Theme</div>
+              <div class="val"><button class="btn small" id="profileThemeBtn">Toggle dark / light</button></div>
+            </div>
+            <div class="settings-row">
+              <div class="key">Sidebar</div>
+              <div class="val"><button class="btn small" id="profileSidebarBtn">Toggle collapsed</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- ======================= COMMAND PALETTE ======================= -->
+<div class="palette-overlay" id="paletteOverlay">
+  <div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Quick jump">
+    <div class="palette-input-row">
+      <svg viewBox="0 0 24 24" width="17" height="17"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="paletteInput" placeholder="Jump to a page or run an action…" autocomplete="off">
+      <kbd>Esc</kbd>
+    </div>
+    <div class="palette-results" id="paletteResults"></div>
+  </div>
+</div>
+
+<!-- ======================= MODAL ======================= -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox" role="dialog" aria-modal="true"></div>
+</div>
+
+<div id="toastHost" class="toast-host"></div>
+
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/pages.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
