@@ -9,7 +9,6 @@
 
 const API = {
   session: "/api/admin?action=session",
-  login: "/api/admin?action=login",
   logout: "/api/admin?action=logout",
   botInfo: "/api/admin?action=bot-info",
   stats: "/api/admin?action=stats",

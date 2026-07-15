@@ -205,6 +205,9 @@ code{ font-family: var(--font-mono); }
 
 .auth-widget-host{ margin: 26px 0 6px; min-height: 44px; display:flex; align-items:center; justify-content:center; }
 .auth-widget-loading{ color: var(--text-faint); font-size:13px; display:flex; align-items:center; gap:8px; }
+.auth-bot-login-btn, a.btn{ text-decoration:none; }
+.auth-bot-login-hint{ color: var(--text-faint); font-size:12.5px; margin: 4px 0 0; }
+.auth-bot-login-hint code{ background: var(--surface-2); border-radius: 4px; padding: 1px 5px; }
 
 .auth-error{
   display:none; margin-top: 6px;

@@ -8,26 +8,36 @@
    body (POST/PUT/DELETE), instead of one file per endpoint.
 
    Actions:
-     bot-info   GET               - public, returns bot @username for the Telegram Login Widget
-     session    GET               - check current admin session
-     login      POST              - verify Telegram Login Widget payload, issue session cookie
-     logout     POST              - clear session cookie
-     stats      GET               - dashboard stats + bot status + latest activity
-     users      GET / POST        - list/search users; ban/unban/delete
-     broadcast  POST              - send announcement to all linked players
-     games      GET/POST/PUT/DELETE - games catalog CRUD
-     news       GET/POST/PUT/DELETE - news/announcements CRUD
-     settings   GET               - masked environment config viewer
+     bot-info     GET               - public, returns bot @username (used to link to the bot)
+     session      GET               - check current admin session
+     verify-token POST              - consume a one-time token from the /admin bot command, issue session cookie
+     logout       POST              - clear session cookie
+     stats        GET               - dashboard stats + bot status + latest activity
+     users        GET / POST        - list/search users; ban/unban/delete
+     broadcast    POST              - send announcement to all linked players
+     games        GET/POST/PUT/DELETE - games catalog CRUD
+     news         GET/POST/PUT/DELETE - news/announcements CRUD
+     settings     GET               - masked environment config viewer
+
+   Login flow (replaces the old Telegram Login Widget):
+     Admin opens the bot -> sends /admin -> bot checks TELEGRAM_ADMIN_ID
+     -> generates a one-time token (stored via ./_lib/sheets, same
+     BotMeta pattern as the pending-broadcast state) -> sends a button
+     linking to /admin-panel/login.html?token=... -> that page calls
+     verify-token here -> we consume the token and issue the same
+     signed admin_session cookie as before.
 
    Uses (unmodified):
      ./_lib/adminAuth    - signed session cookie helpers
-     ./_lib/telegramAuth - Telegram Login Widget HMAC verification
      ./_lib/sheets       - Google Sheets (Apps Script) data access
      ./_lib/telegram     - Telegram Bot API wrapper (via bot.js's sibling)
+
+   Note: ./_lib/telegramAuth.js (Telegram Login Widget HMAC verifier) is
+   no longer imported here. Left in place rather than deleted, per the
+   "avoid unnecessary changes" rule — it's simply unused now.
    ============================================================ */
 
 const { requireAdmin, createSessionToken, setSessionCookie, clearSessionCookie, readSession } = require("./_lib/adminAuth");
-const { verifyTelegramLogin } = require("./_lib/telegramAuth");
 const Sheets = require("./_lib/sheets");
 const TG = require("./_lib/telegram");
 
@@ -53,8 +63,8 @@ function send(res, status, body) {
    Action handlers
    ------------------------------------------------------------ */
 
-// GET — public, no auth. Returns the bot's @username for the
-// Telegram Login Widget on admin.html.
+// GET — public, no auth. Returns the bot's @username so the
+// admin panel's login button can link straight to the bot chat.
 async function handleBotInfo(req, res) {
   if (req.method !== "GET") return send(res, 405, { ok: false, error: "Method not allowed" });
   try {
@@ -78,28 +88,42 @@ async function handleSession(req, res) {
   });
 }
 
-// POST — verify Telegram Login Widget payload, issue session cookie.
-async function handleLogin(req, res) {
+// POST — consume a one-time token minted by the /admin bot command,
+// issue the same signed admin_session cookie as before.
+async function handleVerifyToken(req, res) {
   if (req.method !== "POST") return send(res, 405, { ok: false, error: "Method not allowed" });
 
   const adminId = String(process.env.TELEGRAM_ADMIN_ID || "");
   if (!adminId) return send(res, 500, { ok: false, error: "TELEGRAM_ADMIN_ID is not configured on the server" });
   if (!process.env.ADMIN_SESSION_SECRET) return send(res, 500, { ok: false, error: "ADMIN_SESSION_SECRET is not configured on the server" });
 
-  const data = req.body || {};
+  const body = req.body || {};
+  const token = typeof body.token === "string" ? body.token.trim() : "";
+  if (!token) return send(res, 400, { ok: false, error: "token is required" });
 
-  if (!verifyTelegramLogin(data)) return send(res, 401, { ok: false, error: "Invalid Telegram login payload" });
-  if (String(data.id) !== adminId) return send(res, 403, { ok: false, error: "This Telegram account is not authorized as admin" });
+  const result = await Sheets.consumeAdminLoginToken(token);
+  if (!result.ok) {
+    const messages = {
+      expired: "This login link has expired. Send /admin in the bot again.",
+      invalid: "This login link is invalid. Send /admin in the bot again.",
+      not_found: "This login link has already been used or has expired. Send /admin in the bot again.",
+    };
+    return send(res, 401, { ok: false, error: messages[result.error] || "This login link could not be verified." });
+  }
 
-  const token = createSessionToken(data.id, {
-    name: data.first_name || data.username || "Admin",
-    username: data.username || null,
+  if (String(result.telegramId) !== adminId) {
+    return send(res, 403, { ok: false, error: "This Telegram account is not authorized as admin" });
+  }
+
+  const sessionToken = createSessionToken(result.telegramId, {
+    name: result.name || "Admin",
+    username: result.username || null,
   });
-  setSessionCookie(res, token);
+  setSessionCookie(res, sessionToken);
 
   return send(res, 200, {
     ok: true,
-    admin: { id: data.id, name: data.first_name || data.username || "Admin", username: data.username || null },
+    admin: { id: result.telegramId, name: result.name || "Admin", username: result.username || null },
   });
 }
 
@@ -383,8 +407,8 @@ module.exports = async (req, res) => {
         return await handleBotInfo(req, res);
       case "session":
         return await handleSession(req, res);
-      case "login":
-        return await handleLogin(req, res);
+      case "verify-token":
+        return await handleVerifyToken(req, res);
       case "logout":
         return await handleLogout(req, res);
       case "stats":

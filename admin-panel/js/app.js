@@ -67,45 +67,33 @@ function showApp(admin) {
 
 function onUnauthorized() {
   showLogin("Your session expired. Please sign in again.");
-  initTelegramWidget();
+  initBotLoginButton();
 }
 
 /* ------------------------------------------------------------
-   Telegram Login Widget
+   Telegram-bot login
+   The admin taps this button -> opens the bot chat -> sends
+   /admin there -> the bot replies with a one-time link back to
+   admin-panel/login.html?token=..., which does the actual
+   session exchange and redirects here already signed in.
    ------------------------------------------------------------ */
-window.onTelegramAuth = async function (user) {
-  try {
-    const data = await api(API.login, { method: "POST", body: JSON.stringify(user) });
-    toast(`Welcome back, ${data.admin.name}.`);
-    showApp(data.admin);
-  } catch (err) {
-    showLogin(err.message || "Login failed.");
-  }
-};
-
-async function initTelegramWidget() {
+async function initBotLoginButton() {
   const host = document.getElementById("telegramWidgetHost");
+  const hint = document.getElementById("authBotLoginHint");
   const statusDot = document.getElementById("authApiStatus");
   const statusLabel = document.getElementById("authApiStatusLabel");
+  hint.style.display = "none";
   try {
     const info = await api(API.botInfo);
     statusDot.dataset.state = "ok";
     statusLabel.textContent = "Backend connected";
 
-    host.innerHTML = "";
-    const script = document.createElement("script");
-    script.src = "https://telegram.org/js/telegram-widget.js?22";
-    script.async = true;
-    script.setAttribute("data-telegram-login", info.username);
-    script.setAttribute("data-size", "large");
-    script.setAttribute("data-radius", "10");
-    script.setAttribute("data-onauth", "onTelegramAuth(user)");
-    script.setAttribute("data-request-access", "write");
-    host.appendChild(script);
+    host.innerHTML = `<a class="btn primary full auth-bot-login-btn" href="https://t.me/${encodeURIComponent(info.username)}" target="_blank" rel="noopener noreferrer">🛠 Login via Telegram Bot</a>`;
+    hint.style.display = "block";
   } catch (err) {
     statusDot.dataset.state = "error";
     statusLabel.textContent = "Backend unreachable";
-    host.innerHTML = `<div class="empty-state">Couldn't load Telegram login (${escapeHtml(err.message)}). Check TELEGRAM_BOT_TOKEN and that this panel is deployed on the same domain as the Site backend.</div>`;
+    host.innerHTML = `<div class="empty-state">Couldn't reach the bot (${escapeHtml(err.message)}). Check TELEGRAM_BOT_TOKEN and that this panel is deployed on the same domain as the Site backend.</div>`;
   }
 }
 
@@ -124,11 +112,11 @@ async function checkSession() {
       showApp(data.admin);
     } else {
       showLogin();
-      initTelegramWidget();
+      initBotLoginButton();
     }
   } catch {
     showLogin();
-    initTelegramWidget();
+    initBotLoginButton();
   }
 }
 

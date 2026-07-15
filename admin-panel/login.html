@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Signing in — Pixel&amp;Games Admin</title>
+<meta name="theme-color" content="#0A0E14">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+
+<div id="authGate" class="auth-gate">
+  <div class="auth-bg" aria-hidden="true">
+    <div class="auth-grid"></div>
+    <div class="auth-glow auth-glow-a"></div>
+    <div class="auth-glow auth-glow-b"></div>
+  </div>
+
+  <div class="auth-card">
+    <div class="auth-mark">
+      <span class="auth-mark-glyph">P&amp;G</span>
+    </div>
+    <div class="auth-heading">
+      <h1>Control Room</h1>
+      <p id="loginStatusText">Verifying your login link…</p>
+    </div>
+
+    <div class="auth-widget-host">
+      <div class="auth-widget-loading" id="loginSpinner">
+        <span class="spinner" aria-hidden="true"></span> Signing you in…
+      </div>
+      <a id="backToBotBtn" class="btn primary full" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">🛠 Open the bot again</a>
+    </div>
+
+    <div class="auth-error" id="loginError" role="alert"></div>
+  </div>
+
+  <div class="auth-footer-note">Session cookies are HttpOnly and signed · 12h expiry · no data leaves your Site's own backend</div>
+</div>
+
+<script>
+(function () {
+  function escapeHtml(str) {
+    return String(str == null ? "" : str).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function fail(message, botUsername) {
+    document.getElementById("loginStatusText").textContent = "Couldn't sign you in.";
+    document.getElementById("loginSpinner").style.display = "none";
+    var errBox = document.getElementById("loginError");
+    errBox.textContent = message;
+    errBox.classList.add("show");
+    if (botUsername) {
+      var btn = document.getElementById("backToBotBtn");
+      btn.href = "https://t.me/" + encodeURIComponent(botUsername);
+      btn.style.display = "inline-flex";
+    }
+  }
+
+  async function verify() {
+    var params = new URLSearchParams(window.location.search);
+    var token = params.get("token");
+
+    if (!token) {
+      fail("No login token was found in the link. Send /admin in the bot to get a new one.");
+      return;
+    }
+
+    // Best-effort: fetch the bot username up front so the "open the
+    // bot again" fallback button works even if verification fails.
+    var botUsername = null;
+    try {
+      var infoRes = await fetch("/api/admin?action=bot-info", { credentials: "same-origin" });
+      var info = await infoRes.json().catch(function () { return {}; });
+      if (info && info.ok) botUsername = info.username;
+    } catch (e) {}
+
+    try {
+      var res = await fetch("/api/admin?action=verify-token", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: token }),
+      });
+      var data = await res.json().catch(function () { return {}; });
+
+      if (!res.ok || data.ok === false) {
+        fail(data.error || "This login link could not be verified.", botUsername);
+        return;
+      }
+
+      document.getElementById("loginStatusText").textContent = "Welcome back, " + escapeHtml(data.admin.name) + ". Redirecting…";
+      window.location.replace("/admin-panel/");
+    } catch (e) {
+      fail("Network error — could not reach the server.", botUsername);
+    }
+  }
+
+  verify();
+})();
+</script>
+
+</body>
+</html>

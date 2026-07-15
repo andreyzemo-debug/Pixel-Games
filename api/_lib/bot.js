@@ -5,12 +5,15 @@
    through the two sibling modules in this folder.
    ============================================================ */
 
+const crypto = require("crypto");
 const TG = require("./telegram");
 const Sheets = require("./sheets");
 
 const ADMIN_ID = String(process.env.TELEGRAM_ADMIN_ID || "");
 const SITE_URL = process.env.SITE_URL || "https://pixelandgames.example.com";
+const SITE_PUBLIC_URL = process.env.SITE_PUBLIC_URL || SITE_URL;
 const SUPPORT_CONTACT = process.env.SUPPORT_TELEGRAM_USERNAME || "";
+const ADMIN_LOGIN_TOKEN_TTL_MS = 60 * 1000; // 60 seconds, single use
 
 /* ------------------------------------------------------------
    News — edit this array to publish new posts. Newest first.
@@ -331,6 +334,37 @@ async function handleAdminPanelButton(chatId, from) {
   await TG.sendMessage(chatId, "🛠 <b>Admin Panel</b>", { reply_markup: adminInlineKeyboard() });
 }
 
+/* ------------------------------------------------------------
+   /admin — one-time Admin Panel login link
+   ------------------------------------------------------------ */
+async function handleAdminLoginCommand(chatId, from) {
+  if (!(await requireAdmin(from))) {
+    await TG.sendMessage(chatId, "⛔ Access denied.");
+    return;
+  }
+
+  const token = crypto.randomBytes(32).toString("hex"); // 256-bit, single use
+  const expiresAt = Date.now() + ADMIN_LOGIN_TOKEN_TTL_MS;
+
+  const result = await Sheets.createAdminLoginToken(token, String(from.id), expiresAt, {
+    name: from.first_name || from.username || "Admin",
+    username: from.username || "",
+  });
+
+  if (!result.ok) {
+    await TG.sendMessage(chatId, "⚠️ Couldn't generate a login link right now. Please try again in a moment.");
+    return;
+  }
+
+  const loginUrl = `${SITE_PUBLIC_URL.replace(/\/$/, "")}/admin-panel/login.html?token=${token}`;
+
+  await TG.sendMessage(
+    chatId,
+    "🛠 <b>Admin login link ready.</b>\n\nExpires in 60 seconds and works only once.",
+    { reply_markup: { inline_keyboard: [[{ text: "🛠 Open Admin Panel", url: loginUrl }]] } }
+  );
+}
+
 async function renderAdminSection(section) {
   switch (section) {
     case "stats": {
@@ -567,6 +601,7 @@ async function handleMessage(message) {
   if (!text) return;
 
   if (text.startsWith("/start")) return handleStart(chatId, from);
+  if (text.startsWith("/admin")) return handleAdminLoginCommand(chatId, from);
   if (text.startsWith("/link")) return handleLink(chatId, from, text.slice(5).trim());
   if (text.startsWith("/support")) return handleSupportCommand(chatId, from, text.slice(8).trim());
   if (text.startsWith("/broadcast")) return handleBroadcastCommand(chatId, from, text.slice(10).trim());
