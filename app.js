@@ -3256,7 +3256,7 @@ function renderWallet() {
     document.getElementById("cardHolder").value = user.savedCard.holder;
     document.getElementById("cardNumber").value = user.savedCard.number;
     document.getElementById("cardExpiry").value = user.savedCard.expiry;
-    document.getElementById("cardCVV").value = user.savedCard.cvv;
+    // CVV is intentionally never saved/restored — see processTopup().
     document.getElementById("saveCardCheckbox").checked = true;
   }
   updateCardPreview();
@@ -3374,7 +3374,7 @@ function processTopup() {
   const u = persistCurrentUser((uu) => {
     uu.wallet = Math.round((uu.wallet + amount) * 100) / 100;
     uu.topups.push({ amount, method: brand, last4, date: Date.now() });
-    uu.savedCard = save ? { holder, number, expiry, cvv } : null;
+    uu.savedCard = save ? { holder, number, expiry } : null;
   });
 
   notifyNewAchievements(u);
@@ -4483,42 +4483,13 @@ function toggleAIPanel(force) {
     console.error("Visit notification failed", err);
   }
 
-  // Google Sheets — sent directly from the browser, the same way
-  // the "user" registration write above already does. This does
-  // not go through /api/notify-visit or any backend file — it
-  // mirrors the Users flow, which is proven to reach the sheet.
-  try {
-    let geo = {};
-    try {
-      const geoRes = await fetch("https://ipwho.is/");
-      geo = await geoRes.json();
-    } catch (e) {
-      geo = {};
-    }
+  // NOTE: a direct-from-browser Google Sheets write used to live here
+  // too (type: "visitor"), sent in *addition* to the /api/notify-visit
+  // call above. api/notify-visit.js already forwards every visit to
+  // the same Apps Script URL server-side (see its own comment there),
+  // so this second write was logging every single visit TWICE —
+  // inflating Visitors count, "today's visitors" and "online now" in
+  // the admin dashboard by roughly 2x. Removed; /api/notify-visit is
+  // the single source of truth for visitor logging now.
 
-    fetch(
-      "https://script.google.com/macros/s/AKfycbwGhPqhVsBM94TbBK5KDclFzGxW-3sALt_udomHgmXW1EeBvlDoR_OJTB8FyTGfu9Gs/exec",
-      {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          type: "visitor",
-          country: geo.country || "Unknown",
-          city: geo.city || "Unknown",
-          ip: geo.ip || "",
-          browser: navigator.userAgent,
-          os: navigator.platform,
-          date: new Date().toLocaleDateString(),
-          time: new Date().toLocaleTimeString(),
-        }),
-      },
-    ).catch((err) => {
-      console.warn("Google Sheets error:", err);
-    });
-  } catch (err) {
-    console.warn("Google Sheets notification error:", err);
-  }
 })();

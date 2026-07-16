@@ -33,6 +33,8 @@ const PALETTE_ACTIONS = [
 ];
 
 let currentPage = "dashboard";
+let currentAdmin = null;
+let sessionSignedInAt = null;
 
 /* ------------------------------------------------------------
    Auth gate <-> app shell

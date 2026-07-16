@@ -15,19 +15,15 @@ module.exports = async (req, res) => {
 
   const expectedSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
   if (expectedSecret) {
-  const gotSecret = req.headers["x-telegram-bot-api-secret-token"];
+    const gotSecret = req.headers["x-telegram-bot-api-secret-token"];
 
-  console.log("Expected:", expectedSecret);
-  console.log("Received:", gotSecret);
-
-  if (gotSecret !== expectedSecret) {
-    return res.status(200).json({
-      debug: true,
-      expectedSecret,
-      gotSecret
-    });
+    if (gotSecret !== expectedSecret) {
+      // Do NOT echo the expected/received secret back in the response
+      // or to logs — doing so lets anyone who hits this URL read the
+      // webhook secret and then spoof Telegram updates with it.
+      return res.status(401).json({ ok: false, error: "Unauthorized" });
+    }
   }
-}
 
   try {
     await handleUpdate(req.body || {});

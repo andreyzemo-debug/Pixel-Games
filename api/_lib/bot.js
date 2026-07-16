@@ -470,8 +470,15 @@ async function handleAdminCallback(chatId, messageId, from, action) {
 
   if (action === "broadcast") {
     const pending = await Sheets.getPendingBroadcast();
+    let data = null;
     if (pending.ok) {
-      const data = JSON.parse(pending.value);
+      try {
+        data = JSON.parse(pending.value);
+      } catch {
+        data = null;
+      }
+    }
+    if (data) {
       await TG.editMessageText(
         chatId,
         messageId,
@@ -537,7 +544,14 @@ async function handleBroadcastCallback(chatId, messageId, from, decision) {
     await TG.editMessageText(chatId, messageId, "⚠️ No pending broadcast found (it may have expired).");
     return;
   }
-  const data = JSON.parse(pending.value);
+  let data;
+  try {
+    data = JSON.parse(pending.value);
+  } catch {
+    await TG.editMessageText(chatId, messageId, "⚠️ The pending broadcast was corrupted. Please start a new one with /broadcast.");
+    await Sheets.clearPendingBroadcast();
+    return;
+  }
 
   if (decision === "cancel") {
     await Sheets.clearPendingBroadcast();
