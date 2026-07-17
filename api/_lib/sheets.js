@@ -78,31 +78,31 @@ const Sheets = {
   /* ---- bot-driven writes (unchanged) ---- */
   linkTelegram: (telegramId, query) =>
     gasPost({ type: "telegram_link", telegramId, query }),
-  claimGift: (telegramId) =>
-    gasPost({ type: "telegram_gift", telegramId }),
+  claimGift: (telegramId) => gasPost({ type: "telegram_gift", telegramId }),
   setPendingBroadcast: (telegramId, text) =>
     gasPost({ type: "telegram_set_broadcast", telegramId, text }),
-  clearPendingBroadcast: () =>
-    gasPost({ type: "telegram_clear_broadcast" }),
+  clearPendingBroadcast: () => gasPost({ type: "telegram_clear_broadcast" }),
 
   /* ---- admin one-time login token (bot mints it, admin panel consumes it) ---- */
   createAdminLoginToken: (token, telegramId, expiresAt, meta = {}) =>
     gasPost({
-      type: "admin_login_token_create",
+      type: "admin_token_create",
       token,
       telegramId,
       expiresAt,
       name: meta.name || "",
       username: meta.username || "",
     }),
-  consumeAdminLoginToken: (token) =>
-    gasPost({ type: "admin_login_token_consume", token }),
 
+  consumeAdminLoginToken: (token) =>
+    gasPost({
+      type: "admin_token_consume",
+      token,
+    }),
   /* ---- admin: users management ---- */
   adminListUsers: (search = "", limit = 200) =>
     gasGet("adminListUsers", { search, limit }),
-  adminBanUser: (identifier) =>
-    gasPost({ type: "admin_user_ban", identifier }),
+  adminBanUser: (identifier) => gasPost({ type: "admin_user_ban", identifier }),
   adminUnbanUser: (identifier) =>
     gasPost({ type: "admin_user_unban", identifier }),
   adminDeleteUser: (identifier) =>
