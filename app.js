@@ -34,6 +34,7 @@ const I18N = {
     nav_friends: "Friends",
     nav_partnership: "Partnership",
     nav_ads: "Advertisements",
+    nav_exchange: "Currency Exchange",
     btn_logout: "Log Out",
 
     // ADDED — expanded translation coverage
@@ -65,6 +66,39 @@ const I18N = {
     wallet_no_topups_title: "No Top-Ups Yet",
     wallet_no_topups_desc:
       "Your top-up history will show up here once you add funds.",
+
+    // ADDED — Currency Exchange
+    exchange_title: "Currency Exchange",
+    exchange_desc:
+      "Exchange your coins for real USD. Requests are reviewed by an admin before payout.",
+    exchange_balance_label: "Your Coin Balance",
+    exchange_available_label: "Available to exchange: {amount}",
+    exchange_rate_label: "1000 coins = $1",
+    exchange_form_title: "Exchange coins",
+    exchange_amount_label: "Amount of coins",
+    exchange_amount_placeholder: "1000",
+    exchange_you_receive: "You will receive",
+    exchange_min_notice: "You need at least 1000 coins to exchange.",
+    exchange_insufficient_notice: "You don't have enough coins for this amount.",
+    exchange_payout_title: "Payout details",
+    exchange_payment_method_label: "Payment method",
+    exchange_payout_details_label: "Account / wallet details",
+    exchange_payout_details_placeholder:
+      "Card number, PayPal email, wallet address…",
+    exchange_payout_required: "Please enter your payout details.",
+    exchange_submit_btn: "Request Exchange",
+    exchange_submitted: "Exchange request submitted for review!",
+    exchange_failed: "Could not submit exchange request. Please try again.",
+    exchange_not_synced:
+      "We couldn't verify your balance yet — please try again in a moment.",
+    exchange_history_title: "Exchange history",
+    exchange_no_history: "No exchange requests yet.",
+    exchange_history_error: "Could not load exchange history.",
+    exchange_status_pending: "Pending",
+    exchange_status_approved: "Approved",
+    exchange_status_rejected: "Rejected",
+    exchange_status_completed: "Completed",
+
     daily_bonus_title: "Daily Bonus",
     daily_bonus_desc: "Claim a free reward every 24 hours.",
     daily_bonus_reward: "+50 Coins",
@@ -187,6 +221,7 @@ const I18N = {
     nav_friends: "Друзья",
     nav_partnership: "Партнёрство",
     nav_ads: "Реклама",
+    nav_exchange: "Обмен валют",
     btn_logout: "Выйти",
 
     // ADDED — expanded translation coverage
@@ -219,6 +254,39 @@ const I18N = {
     wallet_no_topups_title: "Пока нет пополнений",
     wallet_no_topups_desc:
       "История пополнений появится здесь после первого пополнения.",
+
+    // ADDED — Обмен валют
+    exchange_title: "Обмен валют",
+    exchange_desc:
+      "Обменивайте монеты на реальные доллары США. Заявки проверяются администратором перед выплатой.",
+    exchange_balance_label: "Баланс монет",
+    exchange_available_label: "Доступно к обмену: {amount}",
+    exchange_rate_label: "1000 монет = $1",
+    exchange_form_title: "Обмен монет",
+    exchange_amount_label: "Количество монет",
+    exchange_amount_placeholder: "1000",
+    exchange_you_receive: "Вы получите",
+    exchange_min_notice: "Для обмена нужно минимум 1000 монет.",
+    exchange_insufficient_notice: "Недостаточно монет для этой суммы.",
+    exchange_payout_title: "Детали выплаты",
+    exchange_payment_method_label: "Способ оплаты",
+    exchange_payout_details_label: "Счёт / реквизиты кошелька",
+    exchange_payout_details_placeholder:
+      "Номер карты, email PayPal, адрес кошелька…",
+    exchange_payout_required: "Укажите реквизиты для выплаты.",
+    exchange_submit_btn: "Запросить обмен",
+    exchange_submitted: "Заявка на обмен отправлена на проверку!",
+    exchange_failed: "Не удалось отправить заявку. Попробуйте снова.",
+    exchange_not_synced:
+      "Не удалось проверить баланс — попробуйте ещё раз через момент.",
+    exchange_history_title: "История обменов",
+    exchange_no_history: "Заявок на обмен пока нет.",
+    exchange_history_error: "Не удалось загрузить историю обменов.",
+    exchange_status_pending: "В ожидании",
+    exchange_status_approved: "Одобрено",
+    exchange_status_rejected: "Отклонено",
+    exchange_status_completed: "Завершено",
+
     daily_bonus_title: "Ежедневный бонус",
     daily_bonus_desc: "Забирайте бесплатную награду каждые 24 часа.",
     daily_bonus_reward: "+50 монет",
@@ -340,6 +408,7 @@ const I18N = {
     nav_friends: "Do'stlar",
     nav_partnership: "Hamkorlik",
     nav_ads: "Reklama",
+    nav_exchange: "Valyuta almashish",
     btn_logout: "Chiqish",
 
     // ADDED — expanded translation coverage
@@ -372,6 +441,39 @@ const I18N = {
     wallet_no_topups_title: "Hali to'ldirishlar yo'q",
     wallet_no_topups_desc:
       "Mablag' qo'shganingizdan so'ng to'ldirishlar tarixi shu yerda ko'rinadi.",
+
+    // ADDED — Valyuta almashish
+    exchange_title: "Valyuta almashish",
+    exchange_desc:
+      "Tangalaringizni haqiqiy AQSH dollariga almashtiring. So'rovlar to'lovdan oldin administrator tomonidan ko'rib chiqiladi.",
+    exchange_balance_label: "Tanga balansingiz",
+    exchange_available_label: "Almashishga mavjud: {amount}",
+    exchange_rate_label: "1000 tanga = $1",
+    exchange_form_title: "Tangalarni almashtirish",
+    exchange_amount_label: "Tangalar miqdori",
+    exchange_amount_placeholder: "1000",
+    exchange_you_receive: "Siz olasiz",
+    exchange_min_notice: "Almashish uchun kamida 1000 tanga kerak.",
+    exchange_insufficient_notice: "Bu miqdor uchun tangalar yetarli emas.",
+    exchange_payout_title: "To'lov ma'lumotlari",
+    exchange_payment_method_label: "To'lov usuli",
+    exchange_payout_details_label: "Hisob / hamyon ma'lumotlari",
+    exchange_payout_details_placeholder:
+      "Karta raqami, PayPal email, hamyon manzili…",
+    exchange_payout_required: "Iltimos, to'lov ma'lumotlarini kiriting.",
+    exchange_submit_btn: "Almashinuv so'rash",
+    exchange_submitted: "Almashinuv so'rovi ko'rib chiqish uchun yuborildi!",
+    exchange_failed: "So'rovni yuborib bo'lmadi. Qayta urinib ko'ring.",
+    exchange_not_synced:
+      "Balansni tekshirib bo'lmadi — birozdan so'ng qayta urinib ko'ring.",
+    exchange_history_title: "Almashinuvlar tarixi",
+    exchange_no_history: "Hozircha almashinuv so'rovlari yo'q.",
+    exchange_history_error: "Almashinuvlar tarixini yuklab bo'lmadi.",
+    exchange_status_pending: "Kutilmoqda",
+    exchange_status_approved: "Tasdiqlandi",
+    exchange_status_rejected: "Rad etildi",
+    exchange_status_completed: "Yakunlandi",
+
     daily_bonus_title: "Kunlik bonus",
     daily_bonus_desc: "Har 24 soatda bepul mukofot oling.",
     daily_bonus_reward: "+50 tanga",
@@ -501,6 +603,7 @@ function refreshDynamicViews() {
     "store",
     "library",
     "wallet",
+    "exchange",
     "profile",
     "friends",
     "partnership",
@@ -511,6 +614,7 @@ function refreshDynamicViews() {
       if (v === "store") renderStore();
       if (v === "library") renderLibrary();
       if (v === "wallet") renderWallet();
+      if (v === "exchange") renderExchange();
       if (v === "profile") renderProfile();
       if (v === "friends") renderFriendsView();
     }
@@ -1298,6 +1402,11 @@ const ACHIEVEMENTS = [
    ADDED — COINS, PREMIUM, DAILY BONUS constants
    ============================================================ */
 const COINS_FROM_DAILY_BONUS = 50;
+// ADDED — Currency Exchange: central client-side constant, purely for
+// display/instant feedback. The server (api/_lib/exchangeConfig.js) is
+// the actual authority on the rate — this only has to match it for the
+// UI to show correct numbers before submitting.
+const COINS_PER_USD = 1000;
 const COINS_FROM_PREMIUM = 300;
 const COINS_PER_MINUTE_PLAYED = 2;
 const COINS_PER_ACHIEVEMENT = 25;
@@ -1703,6 +1812,11 @@ function persistCurrentUser(mutatorFn) {
   ensureUserDefaults(u);
   if (mutatorFn) mutatorFn(u);
   saveUsers(users);
+  // ADDED — Currency Exchange: keep the server-side "siteCoins" ledger
+  // (Sheets, via api/exchange.js) in sync with the local balance every
+  // time it changes, so exchange requests validate against a real,
+  // last-known-server value instead of trusting the exchange form.
+  syncCoinsToServer(u);
   return u;
 }
 
@@ -2043,6 +2157,193 @@ function claimDailyBonus() {
 }
 
 /* ============================================================
+   CURRENCY EXCHANGE (added)
+   ------------------------------------------------------------
+   Displays the LOCAL balance instantly (same as the rest of the
+   site), but every submit re-validates against the server's
+   last-synced siteCoins value — see api/exchange.js / Code.gs.
+   ============================================================ */
+
+// Identifies the current account to the backend the same way
+// findUser/telegram_link already do elsewhere in this codebase —
+// prefer the Gmail, fall back to the numeric account id.
+function exchangeIdentifier(user) {
+  if (!user) return "";
+  return user.gmail || (user.id != null ? String(user.id) : "");
+}
+
+function syncCoinsToServer(user) {
+  const identifier = exchangeIdentifier(user);
+  if (!identifier) return;
+  fetch("/api/exchange?action=sync-coins", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ identifier, coins: Math.max(0, Math.floor(user.coins || 0)) }),
+  }).catch(() => {
+    /* best-effort — a failed sync just means the next mutation retries it */
+  });
+}
+
+function exEscapeHtml(str) {
+  return String(str == null ? "" : str).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+}
+
+function renderExchange() {
+  const user = currentUser();
+  if (!user) return;
+  const coins = Math.max(0, Math.floor(user.coins || 0));
+  const usdAvailable = (coins / COINS_PER_USD).toFixed(2);
+
+  const balanceEl = document.getElementById("exchangeCoinsBalance");
+  if (balanceEl) balanceEl.textContent = "🪙 " + coins.toLocaleString();
+
+  const availEl = document.getElementById("exchangeUsdAvailable");
+  if (availEl) availEl.textContent = t("exchange_available_label", { amount: "$" + usdAvailable });
+
+  const input = document.getElementById("exchangeCoinsInput");
+  if (input) input.value = "";
+
+  updateExchangeCalculation();
+  syncCoinsToServer(user);
+  loadExchangeHistory(user);
+}
+
+function updateExchangeCalculation() {
+  const user = currentUser();
+  const coins = user ? Math.max(0, Math.floor(user.coins || 0)) : 0;
+  const input = document.getElementById("exchangeCoinsInput");
+  const btn = document.getElementById("exchangeSubmitBtn");
+  const usdOut = document.getElementById("exchangeUsdCalculated");
+  const notice = document.getElementById("exchangeMinNotice");
+  if (!input) return;
+
+  const raw = input.value.replace(/[^0-9]/g, "");
+  if (raw !== input.value) input.value = raw;
+
+  const amount = parseInt(raw || "0", 10);
+  const usd = amount > 0 ? amount / COINS_PER_USD : 0;
+  if (usdOut) usdOut.textContent = "$" + usd.toFixed(2);
+
+  let valid = Boolean(raw) && amount > 0;
+  let msg = "";
+  if (valid && amount < COINS_PER_USD) {
+    valid = false;
+    msg = t("exchange_min_notice");
+  } else if (valid && amount > coins) {
+    valid = false;
+    msg = t("exchange_insufficient_notice");
+  }
+
+  if (notice) notice.textContent = msg;
+  if (btn) btn.disabled = !valid;
+}
+
+async function submitExchange() {
+  const user = currentUser();
+  if (!user) return;
+
+  const input = document.getElementById("exchangeCoinsInput");
+  const methodSel = document.getElementById("exchangePayoutMethod");
+  const detailsInput = document.getElementById("exchangePayoutDetails");
+  const btn = document.getElementById("exchangeSubmitBtn");
+
+  const amount = parseInt((input && input.value) || "0", 10);
+  const coins = Math.max(0, Math.floor(user.coins || 0));
+  const paymentMethod = methodSel ? methodSel.value : "";
+  const payoutDetails = detailsInput ? detailsInput.value.trim() : "";
+
+  if (!amount || amount < COINS_PER_USD) {
+    toast(t("exchange_min_notice"));
+    return;
+  }
+  if (amount > coins) {
+    toast(t("exchange_insufficient_notice"));
+    return;
+  }
+  if (!payoutDetails) {
+    toast(t("exchange_payout_required"));
+    return;
+  }
+
+  const identifier = exchangeIdentifier(user);
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch("/api/exchange?action=create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        identifier,
+        coins: amount,
+        paymentMethod,
+        payoutDetails,
+        username: user.nickname || "",
+        email: user.gmail || "",
+      }),
+    });
+    const data = await res.json();
+
+    if (!data.ok) {
+      const messages = {
+        insufficient_coins: t("exchange_insufficient_notice"),
+        not_found: t("exchange_not_synced"),
+      };
+      toast(messages[data.error] || t("exchange_failed"));
+      if (btn) btn.disabled = false;
+      return;
+    }
+
+    // Mirror the server-side deduction locally so the UI stays consistent
+    // with the (already-deducted) server balance without a round trip.
+    persistCurrentUser((uu) => {
+      uu.coins = Math.max(0, (uu.coins || 0) - amount);
+    });
+
+    if (detailsInput) detailsInput.value = "";
+    toast(t("exchange_submitted"));
+    renderCoinsBadge();
+    renderExchange();
+  } catch (err) {
+    toast(t("exchange_failed"));
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function loadExchangeHistory(user) {
+  const list = document.getElementById("exchangeHistoryList");
+  if (!list) return;
+  const identifier = exchangeIdentifier(user);
+  if (!identifier) {
+    list.innerHTML = `<div class="empty-state">${exEscapeHtml(t("exchange_no_history"))}</div>`;
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/exchange?action=history&identifier=" + encodeURIComponent(identifier));
+    const data = await res.json();
+    if (!data.ok || !data.requests || !data.requests.length) {
+      list.innerHTML = `<div class="empty-state">${exEscapeHtml(t("exchange_no_history"))}</div>`;
+      return;
+    }
+    list.innerHTML = data.requests
+      .map((r) => {
+        const statusLabel = t("exchange_status_" + r.status) || r.status;
+        return `
+          <div class="exchange-history-row">
+            <div class="exchange-history-date">${exEscapeHtml(String(r.createdAt).slice(0, 16).replace("T", " "))}</div>
+            <div class="exchange-history-coins">🪙 ${Number(r.coins).toLocaleString()}</div>
+            <div class="exchange-history-usd">$${Number(r.usdAmount).toFixed(2)}</div>
+            <div class="exchange-status-pill status-${exEscapeHtml(r.status)}">${exEscapeHtml(statusLabel)}</div>
+          </div>
+        `;
+      })
+      .join("");
+  } catch (err) {
+    list.innerHTML = `<div class="empty-state">${exEscapeHtml(t("exchange_history_error"))}</div>`;
+  }
+}
+
+/* ============================================================
    App shell / views
    ============================================================ */
 function enterApp() {
@@ -2056,6 +2357,7 @@ function enterApp() {
   }
   syncSiteAccentFromUser();
   renderCoinsBadge();
+  if (user) syncCoinsToServer(user);
   restoreActiveSessionIfAny();
   switchView("store");
 }
@@ -2115,6 +2417,7 @@ function switchView(view) {
     "store",
     "library",
     "wallet",
+    "exchange",
     "profile",
     "friends",
     "partnership",
@@ -2128,6 +2431,7 @@ function switchView(view) {
   if (view === "store") renderStore();
   if (view === "library") renderLibrary();
   if (view === "wallet") renderWallet();
+  if (view === "exchange") renderExchange();
   if (view === "profile") renderProfile();
   if (view === "friends") renderFriendsView();
   if (view === "partnership") renderPartnershipView();
