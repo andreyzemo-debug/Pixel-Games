@@ -13,7 +13,17 @@ const ADMIN_ID = String(process.env.TELEGRAM_ADMIN_ID || "");
 const SITE_URL = process.env.SITE_URL || "https://pixelandgames.example.com";
 const SITE_PUBLIC_URL = process.env.SITE_PUBLIC_URL || SITE_URL;
 const SUPPORT_CONTACT = process.env.SUPPORT_TELEGRAM_USERNAME || "";
-const ADMIN_LOGIN_TOKEN_TTL_MS = 60 * 1000; // 60 seconds, single use
+// Single-use login token lifetime. This used to be 60 seconds, which is
+// where the "infinite login loop" bug came from: by the time Telegram
+// delivered the button tap, the browser opened login.html, and the
+// Google Apps Script backend (which routinely takes several seconds per
+// call, longer on a cold start) finished validating the token, the 60s
+// window was very often already gone. verify-token would then fail with
+// "expired", the page would offer "Open the bot again", the admin would
+// request a new link, and the same race would repeat — forever. 5
+// minutes keeps the link single-use and short-lived while leaving a
+// realistic margin for that round trip.
+const ADMIN_LOGIN_TOKEN_TTL_MS = 5 * 60 * 1000; // 5 minutes, single use
 
 /* ------------------------------------------------------------
    News — edit this array to publish new posts. Newest first.
@@ -360,7 +370,7 @@ async function handleAdminLoginCommand(chatId, from) {
 
   await TG.sendMessage(
     chatId,
-    "🛠 <b>Admin login link ready.</b>\n\nExpires in 60 seconds and works only once.",
+    "🛠 <b>Admin login link ready.</b>\n\nExpires in 5 minutes and works only once.",
     { reply_markup: { inline_keyboard: [[{ text: "🛠 Open Admin Panel", url: loginUrl }]] } }
   );
 }

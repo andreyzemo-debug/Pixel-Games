@@ -72,14 +72,14 @@
       return;
     }
 
-    // Best-effort: fetch the bot username up front so the "open the
-    // bot again" fallback button works even if verification fails.
-    var botUsername = null;
-    try {
-      var infoRes = await fetch("/api/admin?action=bot-info", { credentials: "same-origin" });
-      var info = await infoRes.json().catch(function () { return {}; });
-      if (info && info.ok) botUsername = info.username;
-    } catch (e) {}
+    // Best-effort: fetch the bot username in parallel (not awaited before
+    // verifying) so the "open the bot again" fallback button works if
+    // verification fails, WITHOUT burning any of the token's short TTL on
+    // a network call it doesn't actually need to complete first.
+    var botUsernamePromise = fetch("/api/admin?action=bot-info", { credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (info) { return (info && info.ok) ? info.username : null; })
+      .catch(function () { return null; });
 
     try {
       var res = await fetch("/api/admin?action=verify-token", {
@@ -91,6 +91,7 @@
       var data = await res.json().catch(function () { return {}; });
 
       if (!res.ok || data.ok === false) {
+        var botUsername = await botUsernamePromise;
         fail(data.error || "This login link could not be verified.", botUsername);
         return;
       }
@@ -98,7 +99,8 @@
       document.getElementById("loginStatusText").textContent = "Welcome back, " + escapeHtml(data.admin.name) + ". Redirecting…";
       window.location.replace("/admin-panel/");
     } catch (e) {
-      fail("Network error — could not reach the server.", botUsername);
+      var botUsernameOnError = await botUsernamePromise;
+      fail("Network error — could not reach the server.", botUsernameOnError);
     }
   }
 
