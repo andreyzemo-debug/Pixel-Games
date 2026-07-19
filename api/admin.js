@@ -18,6 +18,7 @@
      games        GET/POST/PUT/DELETE - games catalog CRUD
      news         GET/POST/PUT/DELETE - news/announcements CRUD
      settings     GET               - masked environment config viewer
+     exchanges    GET/POST          - Currency Exchange requests: list/filter, approve/reject (see api/exchange.js for the user-facing side)
 
    Login flow (replaces the old Telegram Login Widget):
      Admin opens the bot -> sends /admin -> bot checks TELEGRAM_ADMIN_ID
@@ -40,6 +41,7 @@
 const { requireAdmin, createSessionToken, setSessionCookie, clearSessionCookie, readSession } = require("./_lib/adminAuth");
 const Sheets = require("./_lib/sheets");
 const TG = require("./_lib/telegram");
+const { coinsToUsd } = require("./_lib/exchangeConfig");
 
 /* ------------------------------------------------------------
    Small helpers
@@ -393,6 +395,51 @@ async function handleSettings(req, res) {
   });
 }
 
+// GET (list/search/filter) / POST (approve/reject). Admin only.
+// ADDED — Currency Exchange admin review queue.
+async function handleExchanges(req, res) {
+  if (!requireAdmin(req, res)) return;
+
+  if (req.method === "GET") {
+    const status = (req.query && req.query.status) || "";
+    const search = (req.query && req.query.search) || "";
+    const result = await Sheets.adminListExchanges(status, search);
+    if (!result.ok) return send(res, 502, { ok: false, error: result.error || "Could not load exchange requests" });
+    return send(res, 200, { ok: true, requests: result.requests || [] });
+  }
+
+  if (req.method === "POST") {
+    const { requestId, exchangeAction } = req.body || {};
+    if (!requestId || typeof requestId !== "string") return send(res, 400, { ok: false, error: "requestId is required" });
+    if (!["approve", "reject"].includes(exchangeAction)) {
+      return send(res, 400, { ok: false, error: "exchangeAction must be approve or reject" });
+    }
+
+    const session = readSession(req);
+    const processedBy = (session && (session.username || session.name)) || "admin";
+
+    const result = await Sheets.processExchangeRequest(requestId, exchangeAction, processedBy);
+    if (!result.ok) {
+      const status = result.error === "already_processed" || result.error === "not_found" ? 409 : 502;
+      return send(res, status, { ok: false, error: result.error || "Action failed" });
+    }
+
+    // Best-effort admin-channel notification — never blocks the response.
+    if (process.env.TELEGRAM_CHAT_ID && result.request) {
+      const r = result.request;
+      const verb = exchangeAction === "approve" ? "✅ Exchange approved" : "❌ Exchange rejected";
+      TG.sendMessage(
+        process.env.TELEGRAM_CHAT_ID,
+        `${verb}\n${escapeHtml(r.username || r.email || r.userId || "")}\n🪙 ${r.coins} coins → $${coinsToUsd(r.coins).toFixed(2)}\nRequest: ${escapeHtml(requestId)}`
+      ).catch(() => {});
+    }
+
+    return send(res, 200, { ok: true });
+  }
+
+  return send(res, 405, { ok: false, error: "Method not allowed" });
+}
+
 /* ------------------------------------------------------------
    Router
    ------------------------------------------------------------ */
@@ -423,6 +470,8 @@ module.exports = async (req, res) => {
         return await handleNews(req, res);
       case "settings":
         return await handleSettings(req, res);
+      case "exchanges":
+        return await handleExchanges(req, res);
       default:
         return send(res, 400, { ok: false, error: "Unknown or missing action" });
     }

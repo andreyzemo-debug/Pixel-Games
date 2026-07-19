@@ -7,26 +7,18 @@
    the site's job, so nothing here can duplicate or corrupt
    existing rows).
 
-   NOTE: This file was restored after being accidentally wiped
-   to 0 bytes (see git history, commit "fixed"). Every action/
-   type name below matches what api/admin.js and api/_lib/bot.js
-   actually call. The read-only/legacy actions (ping, stats,
-   economy, countries, recentUsers, recentVisitors, findUser,
-   telegramProfile, allTelegramIds, getPendingBroadcast,
-   linkTelegram, claimGift, setPendingBroadcast,
-   clearPendingBroadcast) match the previous working version
-   exactly. The admin-login-token and games/news CRUD actions
-   are NEW — your Google Apps Script (Code.gs) must implement
-   matching handlers for these action/type names, or those
-   specific admin panel features (login-via-bot, Games page,
-   News page) will return { ok: false } until it does:
-     GET  action=consumeAdminLoginToken -> type: admin_login_token_create / admin_login_token_consume (POST)
-     GET  action=adminListUsers
-     POST type: admin_user_ban / admin_user_unban / admin_user_delete
-     GET  action=listGames
-     POST type: game_add / game_update / game_delete
-     GET  action=listNews
-     POST type: news_add / news_update / news_delete
+   The read-only/legacy actions (ping, stats, economy, countries,
+   recentUsers, recentVisitors, findUser, telegramProfile,
+   allTelegramIds, getPendingBroadcast, linkTelegram, claimGift,
+   setPendingBroadcast, clearPendingBroadcast) match the
+   previously working version exactly.
+
+   ADDED — Currency Exchange (see Code.gs "NEW — CURRENCY
+   EXCHANGE" section). These are all NEW, additive action/type
+   names — none of them touch the "user"/"visitor" rows, the
+   Telegram coin columns (K–N), games/news, or admin sessions.
+   They read/write ONLY column O ("siteCoins") on Users and the
+   new "ExchangeRequests" sheet.
    ============================================================ */
 
 const GAS_URL =
@@ -63,7 +55,7 @@ async function gasPost(payload) {
 }
 
 const Sheets = {
-  /* ---- read-only stats / lookups (unchanged from the previous working version) ---- */
+  /* ---- read-only stats / lookups (unchanged) ---- */
   ping: () => gasGet("ping"),
   stats: () => gasGet("stats"),
   economy: () => gasGet("economy"),
@@ -119,6 +111,36 @@ const Sheets = {
   addNews: (item) => gasPost({ type: "news_add", item }),
   updateNews: (id, item) => gasPost({ type: "news_update", id, item }),
   deleteNews: (id) => gasPost({ type: "news_delete", id }),
+
+  /* ---- ADDED — Currency Exchange ----
+     siteCoins (column O on the Users sheet) is the server's belief of
+     a site account's coin balance. The site syncs it in the background
+     every time a logged-in user's local balance changes (daily bonus,
+     play rewards, achievements, purchases, ...), keyed by the same
+     email/userId identifier findUser/telegram_link already use. This
+     is the value exchange_create validates and deducts against — never
+     a number sent straight from the exchange form. */
+  syncSiteCoins: (identifier, coins) =>
+    gasPost({ type: "exchange_sync_coins", identifier, coins }),
+
+  createExchangeRequest: ({ identifier, coins, paymentMethod, payoutDetails, username, email }) =>
+    gasPost({
+      type: "exchange_create",
+      identifier,
+      coins,
+      paymentMethod,
+      payoutDetails,
+      username,
+      email,
+    }),
+
+  myExchangeHistory: (identifier) => gasGet("exchangeHistory", { identifier }),
+
+  adminListExchanges: (status = "", search = "") =>
+    gasGet("adminListExchanges", { status, search }),
+
+  processExchangeRequest: (requestId, action, processedBy) =>
+    gasPost({ type: "exchange_process", requestId, action, processedBy }),
 };
 
 module.exports = Sheets;

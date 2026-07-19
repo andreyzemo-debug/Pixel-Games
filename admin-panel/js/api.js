@@ -17,6 +17,7 @@ const API = {
   games: "/api/admin?action=games",
   news: "/api/admin?action=news",
   settings: "/api/admin?action=settings",
+  exchanges: "/api/admin?action=exchanges",
 };
 
 /* ------------------------------------------------------------

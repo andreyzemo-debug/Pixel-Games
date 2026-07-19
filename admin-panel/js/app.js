@@ -10,6 +10,7 @@ const pageLoaders = {
   games: Pages.games,
   news: Pages.news,
   broadcast: () => {},
+  exchanges: () => Pages.exchanges(),
   settings: Pages.settings,
   profile: Pages.profile,
 };
@@ -21,6 +22,7 @@ const PALETTE_PAGES = [
   { page: "games", label: "Games", hint: "Manage" },
   { page: "news", label: "News", hint: "Manage" },
   { page: "broadcast", label: "Broadcast", hint: "Manage" },
+  { page: "exchanges", label: "Exchange Requests", hint: "Manage" },
   { page: "settings", label: "Settings", hint: "System" },
   { page: "profile", label: "Profile", hint: "System" },
 ];
@@ -29,12 +31,11 @@ const PALETTE_ACTIONS = [
   { label: "Publish news", hint: "News", run: () => { goToPage("news"); setTimeout(() => document.getElementById("addNewsBtn")?.click(), 150); } },
   { label: "Send a broadcast", hint: "Broadcast", run: () => { goToPage("broadcast"); setTimeout(() => document.getElementById("broadcastText")?.focus(), 150); } },
   { label: "Search users", hint: "Users", run: () => { goToPage("users"); setTimeout(() => document.getElementById("userSearchInput")?.focus(), 150); } },
+  { label: "Review exchange requests", hint: "Exchange Requests", run: () => goToPage("exchanges") },
   { label: "Log out", hint: "Session", run: () => doLogout() },
 ];
 
 let currentPage = "dashboard";
-let currentAdmin = null;
-let sessionSignedInAt = null;
 
 /* ------------------------------------------------------------
    Auth gate <-> app shell
@@ -311,6 +312,20 @@ function debounce(fn, wait) {
     t = setTimeout(() => fn(...args), wait);
   };
 }
+
+/* ------------------------------------------------------------
+   Exchange Requests page controls (added)
+   ------------------------------------------------------------ */
+document.getElementById("exchangeSearchInput").addEventListener("keydown", (e) => {
+  if (e.key === "Enter") Pages.exchanges(e.target.value.trim());
+});
+document.getElementById("exchangeSearchInput").addEventListener("input", debounce((e) => Pages.exchanges(e.target.value.trim()), 400));
+document.getElementById("exchangeStatusSelect").addEventListener("change", () => Pages.exchanges());
+document.getElementById("exchangeClearBtn").addEventListener("click", () => {
+  document.getElementById("exchangeSearchInput").value = "";
+  document.getElementById("exchangeStatusSelect").value = "";
+  Pages.exchanges("");
+});
 
 /* ------------------------------------------------------------
    Games / News "add" buttons

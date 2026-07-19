@@ -101,6 +101,11 @@
         <svg class="ic" viewBox="0 0 24 24"><path d="M3 11v2a2 2 0 002 2h1l4 4v-12l-4 4H5a2 2 0 00-2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 8.5a5 5 0 010 7M19 5.5a9 9 0 010 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         <span>Broadcast</span>
       </button>
+      <!-- ================= CURRENCY EXCHANGE (added) ================= -->
+      <button class="nav-item" data-page="exchanges">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M7 7h11l-3-3M17 17H6l3 3M7 7v10M17 7v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Exchange Requests</span>
+      </button>
 
       <div class="nav-section-label">System</div>
       <button class="nav-item" data-page="settings">
@@ -344,6 +349,43 @@
               <div id="broadcastResult"></div>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- ================= EXCHANGE REQUESTS (added) ================= -->
+      <section class="page" id="page-exchanges" data-title="Exchange Requests">
+        <div class="page-head">
+          <div>
+            <h1>Exchange Requests</h1>
+            <p class="page-sub">Review, approve or reject player requests to exchange coins for USD.</p>
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="search-field">
+            <svg viewBox="0 0 24 24" width="15" height="15"><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="search" id="exchangeSearchInput" placeholder="Search by username, email, or request ID…">
+          </div>
+          <select id="exchangeStatusSelect" class="select-field">
+            <option value="">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
+            <option value="completed">Completed</option>
+          </select>
+          <button class="btn" id="exchangeClearBtn">Clear</button>
+          <span class="toolbar-count" id="exchangeCount"></span>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Request</th><th>Player</th><th>Coins</th><th>USD</th><th>Method</th><th>Payout details</th><th>Date</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="exchangesTableBody">
+              <tr><td colspan="9" class="loading-state">Loading exchange requests…</td></tr>
+            </tbody>
+          </table>
         </div>
       </section>
 
