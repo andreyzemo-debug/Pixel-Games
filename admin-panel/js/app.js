@@ -27,11 +27,46 @@ const PALETTE_PAGES = [
   { page: "profile", label: "Profile", hint: "System" },
 ];
 const PALETTE_ACTIONS = [
-  { label: "Add a game", hint: "Games", run: () => { goToPage("games"); setTimeout(() => document.getElementById("addGameBtn")?.click(), 150); } },
-  { label: "Publish news", hint: "News", run: () => { goToPage("news"); setTimeout(() => document.getElementById("addNewsBtn")?.click(), 150); } },
-  { label: "Send a broadcast", hint: "Broadcast", run: () => { goToPage("broadcast"); setTimeout(() => document.getElementById("broadcastText")?.focus(), 150); } },
-  { label: "Search users", hint: "Users", run: () => { goToPage("users"); setTimeout(() => document.getElementById("userSearchInput")?.focus(), 150); } },
-  { label: "Review exchange requests", hint: "Exchange Requests", run: () => goToPage("exchanges") },
+  {
+    label: "Add a game",
+    hint: "Games",
+    run: () => {
+      goToPage("games");
+      setTimeout(() => document.getElementById("addGameBtn")?.click(), 150);
+    },
+  },
+  {
+    label: "Publish news",
+    hint: "News",
+    run: () => {
+      goToPage("news");
+      setTimeout(() => document.getElementById("addNewsBtn")?.click(), 150);
+    },
+  },
+  {
+    label: "Send a broadcast",
+    hint: "Broadcast",
+    run: () => {
+      goToPage("broadcast");
+      setTimeout(() => document.getElementById("broadcastText")?.focus(), 150);
+    },
+  },
+  {
+    label: "Search users",
+    hint: "Users",
+    run: () => {
+      goToPage("users");
+      setTimeout(
+        () => document.getElementById("userSearchInput")?.focus(),
+        150,
+      );
+    },
+  },
+  {
+    label: "Review exchange requests",
+    hint: "Exchange Requests",
+    run: () => goToPage("exchanges"),
+  },
   { label: "Log out", hint: "Session", run: () => doLogout() },
 ];
 
@@ -68,7 +103,25 @@ function showApp(admin) {
   pageLoaders.dashboard();
 }
 
-function onUnauthorized() {
+async function onUnauthorized() {
+  // A 401 from some OTHER request (stats, users, whatever) does not by
+  // itself mean the admin session is invalid — it could be a transient
+  // error, a race, or a bug specific to that one endpoint. The session
+  // endpoint is the single source of truth for "am I logged in," so
+  // always re-confirm there before tearing down a working Control Room.
+  try {
+    const res = await fetch(API.session, {
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json().catch(() => ({}));
+    if (data && data.authenticated) {
+      // Session is still good — ignore the unrelated 401, stay logged in.
+      return;
+    }
+  } catch (e) {
+    // Couldn't even reach the session endpoint — fall through and log out below.
+  }
   showLogin("Your session expired. Please sign in again.");
   initBotLoginButton();
 }
@@ -111,16 +164,50 @@ async function doLogout() {
 async function checkSession() {
   try {
     const data = await api(API.session);
-    if (data.authenticated) {
+
+    console.log("SESSION RESULT:", data);
+
+    if (data.authenticated === true && data.admin) {
       showApp(data.admin);
-    } else {
-      if (data.reason) console.warn("Admin session not recognized:", data.reason);
-      showLogin();
+      return;
+    }
+
+    console.warn("Session is not authenticated:", data);
+
+    // Не показываем login сразу.
+    // Сначала ещё раз проверяем сессию через 1 секунду.
+    setTimeout(async () => {
+      try {
+        const retry = await api(API.session);
+
+        console.log("SESSION RETRY RESULT:", retry);
+
+        if (retry.authenticated === true && retry.admin) {
+          showApp(retry.admin);
+          return;
+        }
+
+        showLogin("Your session is not valid. Please sign in again.");
+        initBotLoginButton();
+      } catch (err) {
+        console.error("Session retry failed:", err);
+
+        // ВАЖНО:
+        // Не сбрасываем интерфейс, если приложение уже показано.
+        if (!document.getElementById("appShell").classList.contains("show")) {
+          showLogin("Could not verify your session.");
+          initBotLoginButton();
+        }
+      }
+    }, 1000);
+  } catch (err) {
+    console.error("Initial session check failed:", err);
+
+    // Если приложение уже открыто — не выбрасываем пользователя.
+    if (!document.getElementById("appShell").classList.contains("show")) {
+      showLogin("Could not verify your session.");
       initBotLoginButton();
     }
-  } catch {
-    showLogin();
-    initBotLoginButton();
   }
 }
 
@@ -131,11 +218,16 @@ function goToPage(page, opts = {}) {
   if (!document.getElementById(`page-${page}`)) return;
   currentPage = page;
 
-  document.querySelectorAll(".nav-item").forEach((n) => n.classList.toggle("active", n.dataset.page === page));
-  document.querySelectorAll(".page").forEach((p) => p.classList.toggle("active", p.id === `page-${page}`));
+  document
+    .querySelectorAll(".nav-item")
+    .forEach((n) => n.classList.toggle("active", n.dataset.page === page));
+  document
+    .querySelectorAll(".page")
+    .forEach((p) => p.classList.toggle("active", p.id === `page-${page}`));
 
   const section = document.getElementById(`page-${page}`);
-  document.getElementById("crumbPage").textContent = section.dataset.title || page;
+  document.getElementById("crumbPage").textContent =
+    section.dataset.title || page;
 
   document.getElementById("appShell").classList.remove("mobile-nav-open");
   positionNavIndicator();
@@ -157,8 +249,12 @@ function positionNavIndicator() {
 document.querySelectorAll(".nav-item").forEach((item) => {
   item.addEventListener("click", () => goToPage(item.dataset.page));
 });
-document.getElementById("footProfileBtn").addEventListener("click", () => goToPage("profile"));
-document.getElementById("topbarAvatarBtn").addEventListener("click", () => goToPage("profile"));
+document
+  .getElementById("footProfileBtn")
+  .addEventListener("click", () => goToPage("profile"));
+document
+  .getElementById("topbarAvatarBtn")
+  .addEventListener("click", () => goToPage("profile"));
 window.addEventListener("resize", positionNavIndicator);
 
 /* ------------------------------------------------------------
@@ -172,7 +268,12 @@ document.getElementById("sidebarScrim").addEventListener("click", () => {
 });
 document.getElementById("sidebarCollapseBtn").addEventListener("click", () => {
   document.getElementById("appShell").classList.toggle("sidebar-collapsed");
-  localStorage.setItem("cr_sidebar_collapsed", document.getElementById("appShell").classList.contains("sidebar-collapsed") ? "1" : "0");
+  localStorage.setItem(
+    "cr_sidebar_collapsed",
+    document.getElementById("appShell").classList.contains("sidebar-collapsed")
+      ? "1"
+      : "0",
+  );
   setTimeout(positionNavIndicator, 260);
 });
 if (localStorage.getItem("cr_sidebar_collapsed") === "1") {
@@ -193,8 +294,12 @@ function applyTheme(theme) {
 function toggleTheme() {
   applyTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
 }
-document.getElementById("themeToggleBtn").addEventListener("click", toggleTheme);
-document.getElementById("profileThemeBtn")?.addEventListener("click", toggleTheme);
+document
+  .getElementById("themeToggleBtn")
+  .addEventListener("click", toggleTheme);
+document
+  .getElementById("profileThemeBtn")
+  ?.addEventListener("click", toggleTheme);
 applyTheme(localStorage.getItem("cr_theme") || "dark");
 
 /* ------------------------------------------------------------
@@ -227,7 +332,9 @@ function closePalette() {
 function renderPaletteResults(query) {
   const q = query.trim().toLowerCase();
   const pages = PALETTE_PAGES.filter((p) => p.label.toLowerCase().includes(q));
-  const actions = PALETTE_ACTIONS.filter((a) => a.label.toLowerCase().includes(q));
+  const actions = PALETTE_ACTIONS.filter((a) =>
+    a.label.toLowerCase().includes(q),
+  );
 
   paletteFlatItems = [];
   let html = "";
@@ -276,20 +383,43 @@ function runPaletteItem(idx) {
   if (item.type === "action") item.run();
 }
 
-document.getElementById("openPaletteBtn").addEventListener("click", openPalette);
-document.getElementById("openPaletteBtnTop").addEventListener("click", openPalette);
-paletteOverlay.addEventListener("click", (e) => { if (e.target === paletteOverlay) closePalette(); });
-paletteInput.addEventListener("input", (e) => renderPaletteResults(e.target.value));
+document
+  .getElementById("openPaletteBtn")
+  .addEventListener("click", openPalette);
+document
+  .getElementById("openPaletteBtnTop")
+  .addEventListener("click", openPalette);
+paletteOverlay.addEventListener("click", (e) => {
+  if (e.target === paletteOverlay) closePalette();
+});
+paletteInput.addEventListener("input", (e) =>
+  renderPaletteResults(e.target.value),
+);
 paletteInput.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowDown") { e.preventDefault(); paletteSelIndex = Math.min(paletteSelIndex + 1, paletteFlatItems.length - 1); highlightPaletteSel(); }
-  if (e.key === "ArrowUp") { e.preventDefault(); paletteSelIndex = Math.max(paletteSelIndex - 1, 0); highlightPaletteSel(); }
-  if (e.key === "Enter") { e.preventDefault(); runPaletteItem(paletteSelIndex); }
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    paletteSelIndex = Math.min(
+      paletteSelIndex + 1,
+      paletteFlatItems.length - 1,
+    );
+    highlightPaletteSel();
+  }
+  if (e.key === "ArrowUp") {
+    e.preventDefault();
+    paletteSelIndex = Math.max(paletteSelIndex - 1, 0);
+    highlightPaletteSel();
+  }
+  if (e.key === "Enter") {
+    e.preventDefault();
+    runPaletteItem(paletteSelIndex);
+  }
   if (e.key === "Escape") closePalette();
 });
 document.addEventListener("keydown", (e) => {
   if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
     e.preventDefault();
-    if (document.getElementById("appShell").classList.contains("show")) openPalette();
+    if (document.getElementById("appShell").classList.contains("show"))
+      openPalette();
   }
 });
 
@@ -299,8 +429,13 @@ document.addEventListener("keydown", (e) => {
 document.getElementById("userSearchInput").addEventListener("keydown", (e) => {
   if (e.key === "Enter") Pages.users(e.target.value.trim());
 });
-document.getElementById("userSearchInput").addEventListener("input", debounce((e) => Pages.users(e.target.value.trim()), 400));
-document.getElementById("userLimitSelect").addEventListener("change", () => Pages.users());
+document.getElementById("userSearchInput").addEventListener(
+  "input",
+  debounce((e) => Pages.users(e.target.value.trim()), 400),
+);
+document
+  .getElementById("userLimitSelect")
+  .addEventListener("change", () => Pages.users());
 document.getElementById("userClearBtn").addEventListener("click", () => {
   document.getElementById("userSearchInput").value = "";
   Pages.users("");
@@ -317,11 +452,18 @@ function debounce(fn, wait) {
 /* ------------------------------------------------------------
    Exchange Requests page controls (added)
    ------------------------------------------------------------ */
-document.getElementById("exchangeSearchInput").addEventListener("keydown", (e) => {
-  if (e.key === "Enter") Pages.exchanges(e.target.value.trim());
-});
-document.getElementById("exchangeSearchInput").addEventListener("input", debounce((e) => Pages.exchanges(e.target.value.trim()), 400));
-document.getElementById("exchangeStatusSelect").addEventListener("change", () => Pages.exchanges());
+document
+  .getElementById("exchangeSearchInput")
+  .addEventListener("keydown", (e) => {
+    if (e.key === "Enter") Pages.exchanges(e.target.value.trim());
+  });
+document.getElementById("exchangeSearchInput").addEventListener(
+  "input",
+  debounce((e) => Pages.exchanges(e.target.value.trim()), 400),
+);
+document
+  .getElementById("exchangeStatusSelect")
+  .addEventListener("change", () => Pages.exchanges());
 document.getElementById("exchangeClearBtn").addEventListener("click", () => {
   document.getElementById("exchangeSearchInput").value = "";
   document.getElementById("exchangeStatusSelect").value = "";
@@ -331,8 +473,12 @@ document.getElementById("exchangeClearBtn").addEventListener("click", () => {
 /* ------------------------------------------------------------
    Games / News "add" buttons
    ------------------------------------------------------------ */
-document.getElementById("addGameBtn").addEventListener("click", () => openGameForm(null));
-document.getElementById("addNewsBtn").addEventListener("click", () => openNewsForm(null));
+document
+  .getElementById("addGameBtn")
+  .addEventListener("click", () => openGameForm(null));
+document
+  .getElementById("addNewsBtn")
+  .addEventListener("click", () => openNewsForm(null));
 
 /* ------------------------------------------------------------
    Broadcast wiring
@@ -340,8 +486,10 @@ document.getElementById("addNewsBtn").addEventListener("click", () => openNewsFo
 const broadcastText = document.getElementById("broadcastText");
 const broadcastPreviewBody = document.getElementById("broadcastPreviewBody");
 broadcastText.addEventListener("input", () => {
-  document.getElementById("broadcastCharCount").textContent = `${broadcastText.value.length} / 3500`;
-  broadcastPreviewBody.textContent = broadcastText.value.trim() || "Your message will appear here.";
+  document.getElementById("broadcastCharCount").textContent =
+    `${broadcastText.value.length} / 3500`;
+  broadcastPreviewBody.textContent =
+    broadcastText.value.trim() || "Your message will appear here.";
 });
 
 document.getElementById("broadcastSendBtn").addEventListener("click", () => {
@@ -352,10 +500,14 @@ document.getElementById("broadcastSendBtn").addEventListener("click", () => {
   }
   confirmDialog({
     title: "Send broadcast",
-    message: "This sends the message to every player linked to the Telegram bot right now. Continue?",
+    message:
+      "This sends the message to every player linked to the Telegram bot right now. Continue?",
     confirmLabel: "Send",
     onConfirm: async () => {
-      const data = await api(API.broadcast, { method: "POST", body: JSON.stringify({ message }) });
+      const data = await api(API.broadcast, {
+        method: "POST",
+        body: JSON.stringify({ message }),
+      });
       const panel = document.getElementById("broadcastResultPanel");
       panel.style.display = "block";
       document.getElementById("broadcastResult").innerHTML = `
@@ -378,7 +530,8 @@ document.getElementById("broadcastSendBtn").addEventListener("click", () => {
 document.getElementById("logoutBtn").addEventListener("click", () => {
   confirmDialog({
     title: "Log out",
-    message: "You'll need to sign in with Telegram again to come back to the Control Room.",
+    message:
+      "You'll need to sign in with Telegram again to come back to the Control Room.",
     confirmLabel: "Log out",
     danger: true,
     onConfirm: doLogout,
