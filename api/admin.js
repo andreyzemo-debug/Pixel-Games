@@ -38,7 +38,7 @@
    "avoid unnecessary changes" rule — it's simply unused now.
    ============================================================ */
 
-const { requireAdmin, createSessionToken, setSessionCookie, clearSessionCookie, readSession } = require("./_lib/adminAuth");
+const { requireAdmin, createSessionToken, setSessionCookie, clearSessionCookie, readSession, readSessionDetailed } = require("./_lib/adminAuth");
 const Sheets = require("./_lib/sheets");
 const TG = require("./_lib/telegram");
 const { coinsToUsd } = require("./_lib/exchangeConfig");
@@ -81,12 +81,12 @@ async function handleBotInfo(req, res) {
 // GET — check current admin session.
 async function handleSession(req, res) {
   if (req.method !== "GET") return send(res, 405, { ok: false, error: "Method not allowed" });
-  const session = readSession(req);
-  if (!session) return send(res, 200, { ok: false, authenticated: false });
+  const { payload, reason } = readSessionDetailed(req);
+  if (!payload) return send(res, 200, { ok: true, authenticated: false, reason });
   return send(res, 200, {
     ok: true,
     authenticated: true,
-    admin: { id: session.id, name: session.name, username: session.username },
+    admin: { id: payload.id, name: payload.name, username: payload.username },
   });
 }
 

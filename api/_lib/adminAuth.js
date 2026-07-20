@@ -48,37 +48,47 @@ function createSessionToken(adminId, extra = {}) {
   return `${payloadB64}.${sig}`;
 }
 
-function verifySessionToken(token) {
-  if (!token || typeof token !== "string" || !token.includes(".")) return null;
+function verifySessionTokenDetailed(token) {
+  if (!token || typeof token !== "string") return { payload: null, reason: "no_cookie" };
+  if (!token.includes(".")) return { payload: null, reason: "malformed" };
+
   let secret;
   try {
     secret = getSecret();
   } catch {
-    return null;
+    return { payload: null, reason: "no_secret" };
   }
 
   const [payloadB64, sig] = token.split(".");
-  if (!payloadB64 || !sig) return null;
+  if (!payloadB64 || !sig) return { payload: null, reason: "malformed" };
 
   const expectedSig = sign(payloadB64, secret);
   const a = Buffer.from(sig);
   const b = Buffer.from(expectedSig);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) {
+    return { payload: null, reason: "bad_signature" };
+  }
 
   let payload;
   try {
     payload = JSON.parse(b64urlDecode(payloadB64));
   } catch {
-    return null;
+    return { payload: null, reason: "malformed" };
   }
 
-  if (!payload || typeof payload.exp !== "number") return null;
-  if (Math.floor(Date.now() / 1000) > payload.exp) return null;
+  if (!payload || typeof payload.exp !== "number") return { payload: null, reason: "malformed" };
+  if (Math.floor(Date.now() / 1000) > payload.exp) return { payload: null, reason: "expired" };
 
   const adminId = String(process.env.TELEGRAM_ADMIN_ID || "");
-  if (!adminId || payload.id !== adminId) return null;
+  if (!adminId) return { payload: null, reason: "no_admin_id_env" };
+  if (payload.id !== adminId) return { payload: null, reason: "admin_id_mismatch" };
 
-  return payload;
+  return { payload, reason: null };
+}
+
+// Kept for existing callers (requireAdmin, etc.) — same behavior as before.
+function verifySessionToken(token) {
+  return verifySessionTokenDetailed(token).payload;
 }
 
 function setSessionCookie(res, token) {
@@ -102,6 +112,10 @@ function clearSessionCookie(res) {
    malformed, expired, tampered, or not the configured admin.
    ------------------------------------------------------------ */
 function readSession(req) {
+  return readSessionDetailed(req).payload;
+}
+
+function readSessionDetailed(req) {
   const header = (req.headers && req.headers.cookie) || "";
   let token = null;
   header.split(";").some((pair) => {
@@ -114,7 +128,7 @@ function readSession(req) {
     }
     return false;
   });
-  return verifySessionToken(token);
+  return verifySessionTokenDetailed(token);
 }
 
 /* ------------------------------------------------------------
@@ -138,8 +152,10 @@ module.exports = {
   SESSION_TTL_SECONDS,
   createSessionToken,
   verifySessionToken,
+  verifySessionTokenDetailed,
   setSessionCookie,
   clearSessionCookie,
   readSession,
+  readSessionDetailed,
   requireAdmin,
 };

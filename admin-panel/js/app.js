@@ -114,6 +114,7 @@ async function checkSession() {
     if (data.authenticated) {
       showApp(data.admin);
     } else {
+      if (data.reason) console.warn("Admin session not recognized:", data.reason);
       showLogin();
       initBotLoginButton();
     }
