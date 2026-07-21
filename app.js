@@ -1293,6 +1293,42 @@ const CATALOG = [
     path: "https://3-d-open-world-survival.vercel.app/",
     price: 9.99,
   },
+
+  {
+  id: "g11",
+  title: "PIXEL RUSH",
+  tag: "Neon Arcade Racing",
+  color1: "#151a3d",
+  color2: "#8b5cf6",
+  blurb:
+    "Race through neon tracks, master sharp turns, drift at high speed, and compete for the fastest time in the ultimate Pixel&Games arcade racing experience.",
+  path: "https://git-push-puce.vercel.app",
+  price: 1.99,
+},
+
+{
+  id: "g12",
+  title: "PIXEL TIC-TAC-TOE",
+  tag: "Neon Strategy Classic",
+  color1: "#101828",
+  color2: "#7c3aed",
+  blurb:
+    "Challenge a powerful AI or a friend in a modern neon version of the classic Tic-Tac-Toe game. Master different difficulty levels, unlock unique themes, earn coins, and build your winning streak.",
+  path: "https://tic-tac-alpha-six.vercel.app",
+  price: 0,
+},
+
+{
+  id: "g13",
+  title: "PIXEL SNAKE",
+  tag: "Neon Arcade Classic",
+  color1: "#071a1f",
+  color2: "#00e5ff",
+  blurb:
+    "Grow your neon snake, collect special food, unlock unique skins, complete missions, and chase the highest score in this modern neon arcade classic.",
+  path: "https://snake-games-three.vercel.app/",
+  price: 0,
+},
 ];
 
 /* ============================================================
