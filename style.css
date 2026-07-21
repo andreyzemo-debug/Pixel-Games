@@ -1173,6 +1173,17 @@
   .ai-typing span:nth-child(3){ animation-delay:.3s; }
   @keyframes aiTypingDot{ 0%,60%,100%{ transform:translateY(0); opacity:.4; } 30%{ transform:translateY(-4px); opacity:1; } }
 
+  /* ADDED — Pixel AI quick-action buttons */
+  .ai-quick-actions{
+    display:flex; flex-wrap:wrap; gap:6px; padding:0 14px 10px; flex-shrink:0;
+  }
+  .ai-quick-btn{
+    flex:1 1 calc(50% - 6px); min-width:120px; background:var(--glass-bg); border:1px solid var(--glass-border);
+    color:var(--text-muted); font-size:11px; font-weight:600; padding:8px 9px; border-radius:9px;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:all .15s;
+  }
+  .ai-quick-btn:hover{ color:var(--text); border-color:var(--accent-bright); background:var(--glass-bg-strong); transform:translateY(-1px); }
+
   .ai-input-row{ display:flex; gap:8px; padding:12px 14px 14px; border-top:1px solid var(--glass-border); flex-shrink:0; }
   .ai-input-row input{
     flex:1; background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text);

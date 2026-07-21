@@ -1794,6 +1794,11 @@ function ensureUserDefaults(user) {
     bio: "",
     country: "",
     dailyActivity: {},
+    // ADDED — Pixel AI: tracks the previous visit (for "welcome back"
+    // messages) and caches the one AI-generated greeting per calendar
+    // day so it is never re-requested on every page load.
+    lastSeenAt: null,
+    aiGreetingCache: null, // { date: "YYYY-MM-DD", text: "..." }
   };
   Object.keys(defaults).forEach((key) => {
     if (user[key] === undefined) {
@@ -1909,6 +1914,9 @@ function handleRegister(e) {
     bio: "",
     country: "",
     dailyActivity: {},
+    // ADDED — Pixel AI
+    lastSeenAt: null,
+    aiGreetingCache: null,
     // ADDED — Telegram registration notifications
     id: nextUserId(),
   };
@@ -2360,6 +2368,10 @@ function enterApp() {
   if (user) syncCoinsToServer(user);
   restoreActiveSessionIfAny();
   switchView("store");
+  // ADDED — Pixel AI: instant, zero-cost "welcome back" insight (plain
+  // JS, no API call — see computeVisitInsight), plus at most one real
+  // AI-generated personalized greeting per calendar day.
+  if (user) pixelAIHandleVisit(user);
 }
 
 /* ============================================================
@@ -4030,10 +4042,13 @@ function toast(msg) {
 })();
 
 /* ============================================================
-   Pixel&Games Assistant — 100% offline, vanilla JS only.
-   No fetch/axios/WebSockets/external APIs of any kind.
-   Reuses existing globals (CATALOG, switchView, currentUser, toast)
-   from the main script above — nothing there was modified.
+   Pixel AI — offline keyword-matched assistant (this block) PLUS
+   a real AI-backed layer (see the PIXEL AI section near the end of
+   this file) that only activates for messages this offline layer
+   can't confidently answer, and for the once-per-day personalized
+   greeting. Reuses existing globals (CATALOG, switchView,
+   currentUser, toast) from the main script above — nothing there
+   was modified.
    ============================================================ */
 
 const AI_CHAT_KEY = "pixelgames_ai_chat_history";
@@ -4077,7 +4092,7 @@ const AI_KB = [
       "good evening",
     ],
     responses: [
-      "Hey there! 👋 I'm the Pixel&Games Assistant. Ask me about the Store, your Library, Wallet, or type /help.",
+      "Hey there! 👋 I'm Pixel AI. Ask me about the Store, your Library, Wallet, or type /help.",
       "Hello! Great to see you. What are we exploring today — games, your wallet, or something else?",
       "Hi! Ready to help. Try asking about achievements, wishlists, or just type /help for commands.",
     ],
@@ -4387,6 +4402,30 @@ const AI_KB = [
     ],
   },
   {
+    // ADDED — Pixel AI: answered offline (no AI call) so the numbers
+    // always exactly match the real economy constants above and this
+    // never costs an AI API request.
+    id: "coins_earning",
+    keywords: [
+      "earn coins",
+      "earn more coins",
+      "earn more coin",
+      "how do i earn coins",
+      "get more coins",
+      "get coins",
+      "how to get coins",
+      "how can i earn",
+      "coins guide",
+      "how does coins work",
+      "how do coins work",
+    ],
+    responses: [
+      `Ways to earn Coins: Daily Bonus (+${COINS_FROM_DAILY_BONUS} every 24h), playing games (+${COINS_PER_MINUTE_PLAYED}/minute), adding a free game (+${COINS_FROM_FREE_ADD}), buying a paid game (+${COINS_PER_DOLLAR_SPENT} per $1 spent), and activating Premium (+${COINS_FROM_PREMIUM} one-time).`,
+      `The fastest ways to stack Coins: claim your Daily Bonus (+${COINS_FROM_DAILY_BONUS}), rack up playtime (+${COINS_PER_MINUTE_PLAYED}/min), or go Premium for a +${COINS_FROM_PREMIUM} bonus.`,
+      `Coins come from: Daily Bonus (+${COINS_FROM_DAILY_BONUS}/day), playtime (+${COINS_PER_MINUTE_PLAYED} per minute), free game adds (+${COINS_FROM_FREE_ADD}), purchases (+${COINS_PER_DOLLAR_SPENT} per $1), and Premium activation (+${COINS_FROM_PREMIUM} once).`,
+    ],
+  },
+  {
     id: "html",
     keywords: ["html", "hypertext markup"],
     responses: [
@@ -4410,7 +4449,7 @@ const AI_KB = [
     responses: [
       "JavaScript is what makes this whole launcher interactive — including me! I'm built with 100% vanilla JS, no frameworks.",
       "JavaScript handles the logic: login, the Store, the Wallet, and this chat — all vanilla, no external libraries.",
-      "I run entirely on vanilla JavaScript, no APIs, no frameworks — just plain JS logic and LocalStorage.",
+      "I run on vanilla JavaScript, no frameworks — most of my answers are instant local JS logic, with a small backend call only for the trickier, personalized questions.",
     ],
   },
   {
@@ -4477,9 +4516,14 @@ function aiPickResponse(text) {
       best = topic;
     }
   });
-  if (!best)
-    return AI_FALLBACKS[Math.floor(Math.random() * AI_FALLBACKS.length)];
+  // ADDED — Pixel AI: no confident offline keyword match. Return null
+  // instead of a random fallback string so the caller (aiSendMessage)
+  // can try a real AI-backed answer before giving up.
+  if (!best) return null;
   return best.responses[Math.floor(Math.random() * best.responses.length)];
+}
+function aiFallbackText() {
+  return AI_FALLBACKS[Math.floor(Math.random() * AI_FALLBACKS.length)];
 }
 
 /* ============================================================
@@ -4729,14 +4773,18 @@ function aiSendMessage() {
 
   if (text.startsWith("/")) {
     aiHandleCommand(text);
-  } else {
-    aiShowTyping();
-    const delay = 500 + Math.random() * 700;
-    setTimeout(() => {
-      aiHideTyping();
-      aiAddMessage("bot", aiPickResponse(text));
-    }, delay);
+    return;
   }
+
+  // Free, instant, offline keyword match first — zero cost, zero
+  // network. Only escalate to the real Pixel AI backend (/api/ai)
+  // when nothing in AI_KB confidently matches.
+  const offline = aiPickResponse(text);
+  if (offline) {
+    aiRespondWithDelay(offline);
+    return;
+  }
+  pixelAIAskChat(text);
 }
 
 function toggleAIPanel(force) {
@@ -4748,8 +4796,19 @@ function toggleAIPanel(force) {
     if (aiHistory.length === 0) {
       aiAddMessage(
         "bot",
-        "Hey! I'm the Pixel&Games Assistant, fully offline and ready to help. Try asking about the Store, Wallet, or type /help.",
+        "Hey! I'm Pixel AI, your personal Pixel&Games assistant. Ask me anything, or try a quick action below.",
       );
+    }
+    // ADDED — Pixel AI: surface the (at most once/day) AI-generated
+    // personalized greeting the first time the panel opens after it
+    // was fetched. See pixelAIMaybeFetchDailyGreeting.
+    if (pixelAIPendingGreeting) {
+      const text = pixelAIPendingGreeting;
+      pixelAIPendingGreeting = null;
+      const lastBot = [...aiHistory].reverse().find((m) => m.role === "bot");
+      if (!lastBot || lastBot.text !== text) {
+        aiAddMessage("bot", text);
+      }
     }
     setTimeout(() => document.getElementById("aiInput").focus(), 50);
     aiScrollToBottom();
@@ -4797,3 +4856,322 @@ function toggleAIPanel(force) {
   // the single source of truth for visitor logging now.
 
 })();
+
+/* ============================================================
+   PIXEL AI — real AI-backed layer (added on top of the offline
+   assistant above; nothing above this block was modified in a way
+   that changes its behavior for existing features).
+   ------------------------------------------------------------
+   Talks ONLY to this project's own backend, /api/ai — never to any
+   AI provider directly, and never with an API key in the browser.
+   See api/ai.js and api/_lib/aiProvider.js.
+
+   COST CONTROL (see also the comments at the top of api/ai.js):
+     - "chat" is only ever requested from aiSendMessage() above when
+       the free, offline, keyword-matched assistant (AI_KB) found no
+       confident match for the player's message.
+     - "greeting" is requested AT MOST ONCE PER PLAYER PER CALENDAR
+       DAY. The result is cached on the user record
+       (user.aiGreetingCache = { date, text }) and reused for any
+       further logins/refreshes/panel-opens that same day — see
+       pixelAIMaybeFetchDailyGreeting.
+     - A short client-side cooldown (PIXEL_AI_MIN_CALL_GAP_MS) plus a
+       busy-flag additionally prevent rapid repeat calls; api/ai.js
+       also rate-limits per identifier server-side as a backstop.
+   ============================================================ */
+
+const PIXEL_AI_ENDPOINT = "/api/ai";
+const PIXEL_AI_MIN_CALL_GAP_MS = 4000;
+let pixelAILastCallAt = 0;
+let pixelAIConfigured = null; // null = not checked yet, else true/false
+let pixelAIBusy = false;
+let pixelAIPendingGreeting = null;
+
+/* ---- low-level call wrapper ---- */
+async function pixelAICall(action, payload) {
+  pixelAILastCallAt = Date.now();
+  const res = await fetch(PIXEL_AI_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(Object.assign({ action }, payload)),
+  });
+  let data = null;
+  try {
+    data = await res.json();
+  } catch (e) {}
+  if (!res.ok || !data || !data.ok) {
+    const err = new Error((data && data.error) || `HTTP ${res.status}`);
+    err.code = data && data.error;
+    throw err;
+  }
+  return data;
+}
+
+/* ---- check once (on page load) whether Pixel AI is configured on
+   the server at all, so we can skip pointless calls/UI states if the
+   site owner hasn't added AI_API_KEY yet. The offline assistant works
+   fully either way. ---- */
+(function pixelAICheckConfig() {
+  fetch(`${PIXEL_AI_ENDPOINT}?action=config`)
+    .then((r) => r.json())
+    .then((d) => {
+      pixelAIConfigured = !!(d && d.ok && d.configured);
+    })
+    .catch(() => {
+      pixelAIConfigured = false;
+    });
+})();
+
+/* ============================================================
+   CONTEXT BUILDER
+   ------------------------------------------------------------
+   Whitelisted, minimal context only — see the field list below.
+   NEVER includes password, gmail/session identifiers, wallet/topup
+   history, or anything not needed to answer gaming questions.
+   ============================================================ */
+function pixelAIContext(user, extra) {
+  if (!user) return extra || {};
+
+  const library = (user.library || [])
+    .map((id) => {
+      const g = CATALOG.find((x) => x.id === id);
+      return g ? { title: g.title, genre: g.tag } : null;
+    })
+    .filter(Boolean);
+
+  const wishlist = (user.wishlist || [])
+    .map((id) => {
+      const g = CATALOG.find((x) => x.id === id);
+      return g ? g.title : null;
+    })
+    .filter(Boolean);
+
+  const favorites = (user.favorites || [])
+    .map((id) => {
+      const g = CATALOG.find((x) => x.id === id);
+      return g ? g.title : null;
+    })
+    .filter(Boolean);
+
+  const recentlyPlayed = (user.recentActivity || [])
+    .slice(0, 6)
+    .map((a) => ({ title: a.title }));
+
+  const catalog = CATALOG.map((g) => ({
+    title: g.title,
+    genre: g.tag,
+    price: g.price,
+  }));
+
+  const last = user.lastDailyBonusAt;
+  const dailyBonusReady = !last || Date.now() - last >= DAILY_BONUS_COOLDOWN_MS;
+
+  const ctx = {
+    nickname: user.nickname || "Player",
+    coins: user.coins || 0,
+    premium: !!user.premium,
+    dailyBonusReady,
+    library,
+    wishlist,
+    favorites,
+    recentlyPlayed,
+    catalog,
+  };
+  if (extra) Object.assign(ctx, extra);
+  return ctx;
+}
+
+/* ============================================================
+   VISIT INSIGHT — plain JS, ZERO AI calls. Computes whether this
+   is a notable visit ("haven't seen you in a while" / "you're a
+   regular now") purely from local data already on the account.
+   ============================================================ */
+function pixelAIVisitInsight(user) {
+  const MS_DAY = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  const prevSeen = user.lastSeenAt;
+
+  if (!prevSeen) {
+    // No prior recorded visit (new account, or account created before
+    // this feature existed) — nothing to compare against yet.
+    return { isNew: true, days: 0, frequent: false, message: null };
+  }
+
+  const days = Math.floor((now - prevSeen) / MS_DAY);
+  let message = null;
+  let frequent = false;
+
+  if (days >= 3) {
+    message = `🎮 Welcome back! You haven't visited Pixel&Games for ${days} day${days === 1 ? "" : "s"}. Good to see you again 👀`;
+  } else if (days === 0) {
+    const key = activityDateKey();
+    const todayLogins =
+      (user.dailyActivity && user.dailyActivity[key] && user.dailyActivity[key].logins) || 0;
+    if (todayLogins >= 3) {
+      frequent = true;
+      message = "🔥 Back again? Looks like Pixel&Games is becoming your second home.";
+    }
+  }
+
+  return { isNew: false, days, frequent, message };
+}
+
+/* ============================================================
+   PER-VISIT ENTRY POINT — called once from enterApp()
+   ============================================================ */
+function pixelAIHandleVisit(user) {
+  const insight = pixelAIVisitInsight(user);
+
+  // Record this visit AFTER reading the previous lastSeenAt above,
+  // so "days since previous visit" is computed correctly.
+  persistCurrentUser((uu) => {
+    uu.lastSeenAt = Date.now();
+  });
+
+  if (insight.message) toast(insight.message);
+
+  pixelAIMaybeFetchDailyGreeting(user, insight);
+}
+
+/* ============================================================
+   DAILY-CACHED AI GREETING
+   ------------------------------------------------------------
+   Requests a real AI-generated personalized message AT MOST ONCE
+   PER CALENDAR DAY per account. Every other visit that day reuses
+   the cached text — no new API call, no new cost.
+   ============================================================ */
+function pixelAIMaybeFetchDailyGreeting(user, insight) {
+  if (!user) return;
+  const todayKey = activityDateKey();
+  const cache = user.aiGreetingCache;
+
+  if (cache && cache.date === todayKey && cache.text) {
+    pixelAIPendingGreeting = cache.text;
+    return;
+  }
+
+  // Only bother with a real AI call when there's something notable to
+  // say — a brand-new player, a real absence, or a frequent-visitor
+  // streak. An ordinary, unremarkable same-day reopen doesn't need one.
+  if (!insight.isNew && !insight.message) return;
+  if (pixelAIConfigured === false) return; // known not configured — skip silently
+
+  const context = pixelAIContext(user, {
+    daysSinceVisit: insight.days,
+    frequentVisitor: insight.frequent,
+  });
+
+  pixelAICall("greeting", {
+    identifier: user.gmail || user.nickname || "guest",
+    context,
+  })
+    .then((data) => {
+      const text = data.reply;
+      persistCurrentUser((uu) => {
+        uu.aiGreetingCache = { date: todayKey, text };
+      });
+      pixelAIPendingGreeting = text;
+    })
+    .catch((err) => {
+      // Silent by design — the free JS-computed toast (if any) already
+      // greeted the player; a failed/unconfigured AI call isn't worth
+      // surfacing as an error.
+      console.warn("Pixel AI greeting unavailable:", err.message || err);
+    });
+}
+
+/* ============================================================
+   REAL AI CHAT — only called from aiSendMessage() above when the
+   offline keyword-matched assistant has no confident answer.
+   ============================================================ */
+function pixelAIAskChat(text) {
+  if (pixelAIBusy) {
+    aiRespondWithDelay("Still thinking about your last question — one sec! 🤔");
+    return;
+  }
+  if (pixelAIConfigured === false) {
+    aiRespondWithDelay(aiFallbackText());
+    return;
+  }
+
+  pixelAIBusy = true;
+  aiShowTyping();
+
+  const user = currentUser();
+  const context = pixelAIContext(user);
+  const history = aiHistory.slice(-8).map((m) => ({
+    role: m.role === "user" ? "user" : "assistant",
+    text: m.text,
+  }));
+
+  pixelAICall("chat", {
+    identifier: user ? user.gmail || user.nickname : "guest",
+    message: text,
+    context,
+    history,
+  })
+    .then((data) => {
+      aiHideTyping();
+      aiAddMessage("bot", data.reply);
+    })
+    .catch((err) => {
+      aiHideTyping();
+      if (err.code === "rate_limited") {
+        aiAddMessage(
+          "bot",
+          "I'm getting a lot of questions at once — give me a few seconds and try again. ⏳",
+        );
+      } else {
+        aiAddMessage("bot", aiFallbackText());
+      }
+    })
+    .finally(() => {
+      pixelAIBusy = false;
+    });
+}
+
+/* ============================================================
+   QUICK ACTIONS — the 4 buttons in the Pixel AI panel.
+   "My library" and "What's new?" stay 100% offline/deterministic
+   (zero AI cost, zero hallucination risk on prices/availability).
+   "Recommend a game" and the Coins question route through the
+   normal aiSendMessage() flow — Coins is answered by the free
+   offline KB topic above; recommendations need real personalization
+   so they reach Pixel AI.
+   ============================================================ */
+function pixelAIQuickAction(type) {
+  if (type === "recommend") {
+    aiAddMessage("user", "Recommend a game for me.");
+    pixelAIAskChat("Recommend a game for me, and briefly explain why.");
+    return;
+  }
+  if (type === "coins") {
+    aiAddMessage("user", "How can I earn more Coins?");
+    const offline = aiPickResponse("how can i earn more coins");
+    aiRespondWithDelay(offline || aiFallbackText());
+    return;
+  }
+  if (type === "library") {
+    aiAddMessage("user", "My library");
+    aiGoTo("library", "your Library");
+    return;
+  }
+  if (type === "whatsnew") {
+    aiAddMessage("user", "What's new?");
+    if (typeof CATALOG !== "undefined") {
+      const list = CATALOG.map(
+        (g) =>
+          `• ${g.title} — ${g.tag}${g.price > 0 ? ` — $${g.price.toFixed(2)}` : " — FREE"}`,
+      ).join("\n");
+      aiRespondWithDelay(
+        "Pixel&Games doesn't track individual release dates yet, but here's everything currently in the Store:\n" +
+          list,
+      );
+    } else {
+      aiRespondWithDelay(
+        "I couldn't reach the game catalog just now — try opening the Store directly.",
+      );
+    }
+    return;
+  }
+}

@@ -699,15 +699,15 @@
 <div id="modalMount"></div>
 <div id="toast"></div>
 
-<!-- ================= OFFLINE AI ASSISTANT (added) ================= -->
-<button class="ai-toggle-btn" id="aiToggleBtn" onclick="toggleAIPanel()" title="Pixel&Games Assistant">
+<!-- ================= PIXEL AI ASSISTANT (added) ================= -->
+<button class="ai-toggle-btn" id="aiToggleBtn" onclick="toggleAIPanel()" title="Pixel AI">
   🤖<span class="ai-dot"></span>
 </button>
 <div class="ai-panel" id="aiPanel">
   <div class="ai-header">
     <div class="ai-header-title">
       <div class="ai-header-avatar">🤖</div>
-      Pixel&amp;Games Assistant
+      Pixel AI
     </div>
     <div class="ai-header-actions">
       <button class="ai-icon-btn" title="Toggle theme" onclick="aiToggleTheme()">🌓</button>
@@ -716,6 +716,12 @@
     </div>
   </div>
   <div class="ai-messages" id="aiMessages"></div>
+  <div class="ai-quick-actions">
+    <button class="ai-quick-btn" onclick="pixelAIQuickAction('recommend')">🎯 Recommend a game</button>
+    <button class="ai-quick-btn" onclick="pixelAIQuickAction('whatsnew')">🆕 What's new?</button>
+    <button class="ai-quick-btn" onclick="pixelAIQuickAction('coins')">🪙 Earn Coins</button>
+    <button class="ai-quick-btn" onclick="pixelAIQuickAction('library')">📚 My library</button>
+  </div>
   <div class="ai-input-row">
     <input type="text" id="aiInput" placeholder="Ask me anything, or try /help" onkeydown="if(event.key==='Enter') aiSendMessage();">
     <button class="ai-send-btn" onclick="aiSendMessage()">➤</button>
@@ -723,7 +729,7 @@
 </div>
 
 
-<!-- ================= OFFLINE AI ASSISTANT SCRIPT (added) ================= -->
+<!-- ================= PIXEL AI SCRIPT (added) ================= -->
 <script src="app.js"></script>
 </body>
 </html>
