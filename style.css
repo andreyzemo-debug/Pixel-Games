@@ -154,6 +154,24 @@
   html[data-bg="forest"]{ --page-bg-1:rgba(16,185,129,0.08); --page-bg-2:rgba(95,191,179,0.05); --page-bg-base:#071b12; }
   html[data-bg="sunset"]{ --page-bg-1:rgba(249,115,22,0.09); --page-bg-2:rgba(239,68,68,0.06); --page-bg-base:#1a0e08; }
   html[data-bg="galaxy"]{ --page-bg-1:rgba(155,107,255,0.10); --page-bg-2:rgba(79,140,255,0.05); --page-bg-base:#0d0620; }
+  html[data-bg="aurora"]{ --page-bg-1:rgba(52,211,153,0.09); --page-bg-2:rgba(34,211,238,0.07); --page-bg-base:#04120f; }
+  html[data-bg="lavender"]{ --page-bg-1:rgba(196,163,255,0.09); --page-bg-2:rgba(139,92,246,0.06); --page-bg-base:#140f24; }
+  html[data-bg="crimson"]{ --page-bg-1:rgba(220,38,38,0.09); --page-bg-2:rgba(127,29,29,0.08); --page-bg-base:#1a0808; }
+  html[data-bg="desert"]{ --page-bg-1:rgba(217,164,90,0.10); --page-bg-2:rgba(180,83,9,0.06); --page-bg-base:#1c130a; }
+  html[data-bg="toxic"]{ --page-bg-1:rgba(163,230,53,0.10); --page-bg-2:rgba(34,197,94,0.07); --page-bg-base:#081209; }
+  html[data-bg="royal"]{ --page-bg-1:rgba(67,56,202,0.10); --page-bg-2:rgba(124,58,237,0.06); --page-bg-base:#0b0a22; }
+  html[data-bg="rose"]{ --page-bg-1:rgba(244,63,94,0.09); --page-bg-2:rgba(159,18,57,0.07); --page-bg-base:#1a0a12; }
+  html[data-bg="coffee"]{ --page-bg-1:rgba(146,98,60,0.09); --page-bg-2:rgba(87,58,38,0.08); --page-bg-base:#160f0a; }
+  html[data-bg="ice"]{ --page-bg-1:rgba(165,243,252,0.08); --page-bg-2:rgba(103,232,249,0.06); --page-bg-base:#061620; }
+  html[data-bg="void"]{ --page-bg-1:rgba(255,255,255,0.02); --page-bg-2:rgba(255,255,255,0.015); --page-bg-base:#020203; }
+  html[data-bg="neon-city"]{ --page-bg-1:rgba(217,70,239,0.08); --page-bg-2:rgba(34,211,238,0.07); --page-bg-base:#080618; }
+  html[data-bg="deep-space"]{ --page-bg-1:rgba(88,28,135,0.08); --page-bg-2:rgba(30,27,75,0.07); --page-bg-base:#030308; }
+  html[data-bg="volcanic"]{ --page-bg-1:rgba(239,68,68,0.09); --page-bg-2:rgba(249,115,22,0.05); --page-bg-base:#0a0403; }
+  html[data-bg="matrix"]{ --page-bg-1:rgba(74,222,128,0.08); --page-bg-2:rgba(21,128,61,0.07); --page-bg-base:#020a04; }
+  html[data-bg="sakura"]{ --page-bg-1:rgba(244,114,182,0.09); --page-bg-2:rgba(168,85,247,0.06); --page-bg-base:#150a17; }
+  html[data-bg="bronze"]{ --page-bg-1:rgba(205,127,50,0.09); --page-bg-2:rgba(120,72,32,0.07); --page-bg-base:#140d07; }
+  html[data-bg="storm"]{ --page-bg-1:rgba(148,163,184,0.07); --page-bg-2:rgba(51,65,85,0.08); --page-bg-base:#0d1017; }
+  html[data-bg="deep-purple"]{ --page-bg-1:rgba(126,34,206,0.09); --page-bg-2:rgba(76,29,149,0.07); --page-bg-base:#0f0518; }
   img, svg{ max-width:100%; }
   ::selection{ background:var(--gold); color:var(--bg-deep); }
   button{ font-family:inherit; cursor:pointer; border:none; }
