@@ -189,11 +189,43 @@
         </div>
       </div>
 
-      <!-- ================= LIGHT / DARK THEME TOGGLE (added) — icon only ================= -->
-      <button class="topnav-icon-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleSiteTheme()" title="Toggle light / dark theme">
-        <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="hidden"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
-        <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7.2 7.2 0 0 0 9.8 9.8z"/></svg>
-      </button>
+      <!-- ================= LIGHT / DARK THEME + ACCENT COLOR (added) — icon only, opens popover ================= -->
+      <div class="topnav-theme-wrap">
+        <button class="topnav-icon-btn theme-toggle-btn" id="themeToggleBtn" onclick="toggleAccentPopover(event)" title="Theme &amp; accent color">
+          <svg id="themeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="hidden"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+          <svg id="themeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7.2 7.2 0 0 0 9.8 9.8z"/></svg>
+        </button>
+
+        <div class="accent-popover hidden" id="accentPopover">
+          <button type="button" class="accent-mode-switch" id="accentModeSwitch" onclick="toggleSiteTheme()" title="Toggle light / dark theme">
+            <svg id="accentModeIconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="hidden"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.4M12 19.1v2.4M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+            <svg id="accentModeIconMoon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.8A9 9 0 1 1 11.2 3a7.2 7.2 0 0 0 9.8 9.8z"/></svg>
+            <span id="accentModeLabel">Dark Mode</span>
+          </button>
+
+          <div class="accent-popover-divider"></div>
+
+          <div>
+            <div class="accent-popover-label">Accent Color</div>
+            <div class="accent-preset-grid" id="accentPresetGrid">
+              <button type="button" class="accent-swatch" style="background:#9b6bff" data-color="#9b6bff" data-bright="#c19bff" onclick="selectAccentPreset(this)" title="Purple"></button>
+              <button type="button" class="accent-swatch" style="background:#4f8cff" data-color="#4f8cff" data-bright="#7fb0ff" onclick="selectAccentPreset(this)" title="Blue"></button>
+              <button type="button" class="accent-swatch" style="background:#22d3ee" data-color="#22d3ee" data-bright="#67e8f9" onclick="selectAccentPreset(this)" title="Cyan"></button>
+              <button type="button" class="accent-swatch" style="background:#ec4899" data-color="#ec4899" data-bright="#f472b6" onclick="selectAccentPreset(this)" title="Pink"></button>
+              <button type="button" class="accent-swatch" style="background:#ef4444" data-color="#ef4444" data-bright="#f87171" onclick="selectAccentPreset(this)" title="Red"></button>
+              <button type="button" class="accent-swatch" style="background:#f97316" data-color="#f97316" data-bright="#fb923c" onclick="selectAccentPreset(this)" title="Orange"></button>
+              <button type="button" class="accent-swatch" style="background:#10b981" data-color="#10b981" data-bright="#34d399" onclick="selectAccentPreset(this)" title="Green"></button>
+            </div>
+          </div>
+
+          <div class="accent-popover-custom">
+            <span class="accent-popover-label" style="margin-bottom:0">Custom</span>
+            <input type="color" class="accent-custom-input" id="accentCustomInput" value="#9b6bff" oninput="selectCustomAccentColor(this.value)" title="Pick a custom accent color">
+          </div>
+
+          <button type="button" class="accent-popover-reset" onclick="resetAccentToDefault()">Reset to Default</button>
+        </div>
+      </div>
 
       <!-- ================= FULLSCREEN TOGGLE (added) — icon only ================= -->
       <button class="topnav-icon-btn fullscreen-toggle-btn" id="fullscreenBtn" onclick="toggleFullscreen()" title="Fullscreen">

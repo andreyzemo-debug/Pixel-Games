@@ -731,6 +731,13 @@ function updateThemeToggleButton(theme) {
   const moonIcon = document.getElementById("themeIconMoon");
   if (sunIcon) sunIcon.classList.toggle("hidden", theme !== "dark");
   if (moonIcon) moonIcon.classList.toggle("hidden", theme === "dark");
+  // ADDED — keep the accent popover's own light/dark switch in sync
+  const modeSunIcon = document.getElementById("accentModeIconSun");
+  const modeMoonIcon = document.getElementById("accentModeIconMoon");
+  const modeLabel = document.getElementById("accentModeLabel");
+  if (modeSunIcon) modeSunIcon.classList.toggle("hidden", theme !== "dark");
+  if (modeMoonIcon) modeMoonIcon.classList.toggle("hidden", theme === "dark");
+  if (modeLabel) modeLabel.textContent = theme === "light" ? "Light Mode" : "Dark Mode";
 }
 function applySiteTheme(theme) {
   document.documentElement.setAttribute("data-theme", theme);
@@ -765,7 +772,125 @@ function syncSiteAccentFromUser() {
 document.addEventListener("DOMContentLoaded", function () {
   applySiteTheme(getSiteTheme());
   syncSiteAccentFromUser();
+  restoreAccentOverride();
 });
+
+/* ============================================================
+   ADDED — ACCENT COLOR CUSTOMIZATION POPOVER
+   Opens from the existing light/dark theme button. Lets the user
+   pick one of 7 preset colors or a fully custom color via an HTML
+   color input. Reuses the existing accent CSS-variable architecture
+   (--accent / --accent-bright / --accent-rgb) — it just applies the
+   chosen color as an inline style on <html>, which naturally takes
+   priority over the [data-accent] presets and the light/dark
+   defaults, without touching either of those systems. Persisted in
+   localStorage, independent of the light/dark theme setting.
+   ============================================================ */
+const ACCENT_OVERRIDE_KEY = "pixelgames_accent_override";
+
+function hexToRgbString(hex) {
+  const full =
+    hex.replace("#", "").length === 3
+      ? hex
+          .replace("#", "")
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : hex.replace("#", "");
+  const bigint = parseInt(full, 16);
+  return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255].join(",");
+}
+function lightenHex(hex, amount) {
+  const full =
+    hex.replace("#", "").length === 3
+      ? hex
+          .replace("#", "")
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : hex.replace("#", "");
+  const bigint = parseInt(full, 16);
+  const r = Math.round(((bigint >> 16) & 255) + (255 - ((bigint >> 16) & 255)) * amount);
+  const g = Math.round(((bigint >> 8) & 255) + (255 - ((bigint >> 8) & 255)) * amount);
+  const b = Math.round((bigint & 255) + (255 - (bigint & 255)) * amount);
+  return (
+    "#" +
+    [r, g, b]
+      .map((v) => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0"))
+      .join("")
+  );
+}
+function applyAccentOverride(hex, brightHex) {
+  const bright = brightHex || lightenHex(hex, 0.25);
+  document.documentElement.style.setProperty("--accent", hex);
+  document.documentElement.style.setProperty("--accent-bright", bright);
+  document.documentElement.style.setProperty("--accent-rgb", hexToRgbString(hex));
+}
+function loadAccentOverride() {
+  try {
+    const raw = localStorage.getItem(ACCENT_OVERRIDE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+function saveAccentOverride(hex, bright) {
+  try {
+    localStorage.setItem(ACCENT_OVERRIDE_KEY, JSON.stringify({ hex: hex, bright: bright }));
+  } catch (e) {}
+}
+function restoreAccentOverride() {
+  const saved = loadAccentOverride();
+  if (saved && saved.hex) applyAccentOverride(saved.hex, saved.bright);
+}
+function selectAccentPreset(btn) {
+  const hex = btn.getAttribute("data-color");
+  const bright = btn.getAttribute("data-bright");
+  applyAccentOverride(hex, bright);
+  saveAccentOverride(hex, bright);
+  renderAccentPopover();
+}
+function selectCustomAccentColor(hex) {
+  const bright = lightenHex(hex, 0.25);
+  applyAccentOverride(hex, bright);
+  saveAccentOverride(hex, bright);
+  renderAccentPopover();
+}
+function resetAccentToDefault() {
+  document.documentElement.style.removeProperty("--accent");
+  document.documentElement.style.removeProperty("--accent-bright");
+  document.documentElement.style.removeProperty("--accent-rgb");
+  try {
+    localStorage.removeItem(ACCENT_OVERRIDE_KEY);
+  } catch (e) {}
+  renderAccentPopover();
+}
+function renderAccentPopover() {
+  const saved = loadAccentOverride();
+  document.querySelectorAll("#accentPresetGrid .accent-swatch").forEach((btn) => {
+    const isActive =
+      !!saved &&
+      !!saved.hex &&
+      saved.hex.toLowerCase() === (btn.getAttribute("data-color") || "").toLowerCase();
+    btn.classList.toggle("active", isActive);
+  });
+  const customInput = document.getElementById("accentCustomInput");
+  if (customInput && saved && saved.hex) customInput.value = saved.hex;
+}
+function toggleAccentPopover(event) {
+  if (event) event.stopPropagation();
+  closeNotifications();
+  closeUserMenu();
+  const pop = document.getElementById("accentPopover");
+  if (!pop) return;
+  const willOpen = pop.classList.contains("hidden");
+  pop.classList.toggle("hidden");
+  if (willOpen) renderAccentPopover();
+}
+function closeAccentPopover() {
+  const pop = document.getElementById("accentPopover");
+  if (pop) pop.classList.add("hidden");
+}
 
 /* ============================================================
    ADDED — TOP NAV: mobile hamburger menu
@@ -795,6 +920,7 @@ window.addEventListener("resize", function () {
 function toggleNotifications(event) {
   if (event) event.stopPropagation();
   closeUserMenu();
+  closeAccentPopover();
   const dd = document.getElementById("notifDropdown");
   if (!dd) return;
   const willOpen = dd.classList.contains("hidden");
@@ -845,6 +971,7 @@ function renderNotifications() {
 function toggleUserMenu(event) {
   if (event) event.stopPropagation();
   closeNotifications();
+  closeAccentPopover();
   const menu = document.getElementById("userDropdownMenu");
   const btn = document.getElementById("topnavUser");
   if (!menu) return;
@@ -866,8 +993,10 @@ function closeUserMenu() {
 document.addEventListener("click", function (e) {
   const notifWrap = document.querySelector(".topnav-notif-wrap");
   const userWrap = document.querySelector(".topnav-user-wrap");
+  const themeWrap = document.querySelector(".topnav-theme-wrap");
   if (notifWrap && !notifWrap.contains(e.target)) closeNotifications();
   if (userWrap && !userWrap.contains(e.target)) closeUserMenu();
+  if (themeWrap && !themeWrap.contains(e.target)) closeAccentPopover();
   const nav = document.getElementById("topnavCenter");
   const menuBtn = document.getElementById("mobileMenuBtn");
   if (
@@ -884,6 +1013,7 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") {
     closeNotifications();
     closeUserMenu();
+    closeAccentPopover();
     closeMobileNav();
   }
 });
