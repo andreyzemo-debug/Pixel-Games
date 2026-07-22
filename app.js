@@ -773,6 +773,7 @@ document.addEventListener("DOMContentLoaded", function () {
   applySiteTheme(getSiteTheme());
   syncSiteAccentFromUser();
   restoreAccentOverride();
+  restoreBackground();
 });
 
 /* ============================================================
@@ -885,11 +886,116 @@ function toggleAccentPopover(event) {
   if (!pop) return;
   const willOpen = pop.classList.contains("hidden");
   pop.classList.toggle("hidden");
-  if (willOpen) renderAccentPopover();
+  if (willOpen) {
+    renderAccentPopover();
+    renderBackgroundPopover();
+  }
 }
 function closeAccentPopover() {
   const pop = document.getElementById("accentPopover");
   if (pop) pop.classList.add("hidden");
+}
+
+/* ============================================================
+   ADDED — BACKGROUND CUSTOMIZATION
+   Lives in the same popover as the accent color picker above, and
+   is completely independent from it: it only ever touches the
+   --page-bg-1 / --page-bg-2 / --page-bg-base CSS variables (which
+   solely drive the body's ambient background in style.css), so the
+   light/dark theme and the accent color are never affected by a
+   background change, and vice versa. Persisted separately in
+   localStorage, and restored on load alongside theme + accent.
+   ============================================================ */
+const BACKGROUND_KEY = "pixelgames_background";
+const BACKGROUND_PRESETS = [
+  "default",
+  "midnight",
+  "cyberpunk",
+  "ocean",
+  "forest",
+  "sunset",
+  "galaxy",
+];
+
+function applyBackgroundPreset(name) {
+  document.documentElement.setAttribute("data-bg", name || "default");
+  // A manual preset always wins over any previous custom color override.
+  document.documentElement.style.removeProperty("--page-bg-1");
+  document.documentElement.style.removeProperty("--page-bg-2");
+  document.documentElement.style.removeProperty("--page-bg-base");
+}
+function applyCustomBackground(hex) {
+  // A custom color always wins over any preset attribute.
+  document.documentElement.removeAttribute("data-bg");
+  document.documentElement.style.setProperty("--page-bg-base", hex);
+  document.documentElement.style.setProperty("--page-bg-1", "rgba(255,255,255,0.05)");
+  document.documentElement.style.setProperty("--page-bg-2", "rgba(0,0,0,0.14)");
+}
+function resetBackgroundVars() {
+  document.documentElement.removeAttribute("data-bg");
+  document.documentElement.style.removeProperty("--page-bg-1");
+  document.documentElement.style.removeProperty("--page-bg-2");
+  document.documentElement.style.removeProperty("--page-bg-base");
+}
+function loadBackground() {
+  try {
+    const raw = localStorage.getItem(BACKGROUND_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+function saveBackground(data) {
+  try {
+    localStorage.setItem(BACKGROUND_KEY, JSON.stringify(data));
+  } catch (e) {}
+}
+function restoreBackground() {
+  const saved = loadBackground();
+  if (!saved) return;
+  if (saved.type === "custom" && saved.value) {
+    applyCustomBackground(saved.value);
+  } else if (saved.type === "preset" && saved.value && saved.value !== "default") {
+    applyBackgroundPreset(saved.value);
+  }
+}
+function selectBackgroundPreset(btn) {
+  const name = btn.getAttribute("data-bg-name") || "default";
+  applyBackgroundPreset(name);
+  if (name === "default") {
+    try {
+      localStorage.removeItem(BACKGROUND_KEY);
+    } catch (e) {}
+  } else {
+    saveBackground({ type: "preset", value: name });
+  }
+  renderBackgroundPopover();
+}
+function selectCustomBackgroundColor(hex) {
+  applyCustomBackground(hex);
+  saveBackground({ type: "custom", value: hex });
+  renderBackgroundPopover();
+}
+function resetBackgroundToDefault() {
+  resetBackgroundVars();
+  try {
+    localStorage.removeItem(BACKGROUND_KEY);
+  } catch (e) {}
+  renderBackgroundPopover();
+}
+function renderBackgroundPopover() {
+  const saved = loadBackground();
+  document.querySelectorAll("#bgPresetGrid .bg-chip").forEach((btn) => {
+    const name = btn.getAttribute("data-bg-name");
+    const isActive =
+      (saved && saved.type === "preset" && saved.value === name) ||
+      (!saved && name === "default");
+    btn.classList.toggle("active", !!isActive);
+  });
+  const customInput = document.getElementById("bgCustomInput");
+  if (customInput && saved && saved.type === "custom" && saved.value) {
+    customInput.value = saved.value;
+  }
 }
 
 /* ============================================================

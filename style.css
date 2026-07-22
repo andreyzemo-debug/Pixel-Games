@@ -50,6 +50,15 @@
     --scrim:rgba(8,7,12,0.72);
     --shadow-soft:rgba(0,0,0,.35);
     --shadow-strong:rgba(0,0,0,.5);
+
+    /* --- added: PAGE BACKGROUND system ---
+       Drives the body's ambient background only. Cards, surfaces, and
+       every other CSS variable above are untouched, so presets stay
+       subtle and premium instead of replacing the whole design.
+       Default = the original two-tone gold/teal glow over --bg-deep. */
+    --page-bg-1:rgba(212,169,74,0.07);
+    --page-bg-2:rgba(95,191,179,0.05);
+    --page-bg-base:var(--bg-deep);
   }
 
   /* ================================================================
@@ -122,15 +131,29 @@
   html{ overflow-x:hidden; width:100%; }
   body{
     background:
-      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(212,169,74,0.07), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 100% 10%, rgba(95,191,179,0.05), transparent 60%),
-      var(--bg-deep);
+      radial-gradient(ellipse 900px 500px at 15% -10%, var(--page-bg-1), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 10%, var(--page-bg-2), transparent 60%),
+      var(--page-bg-base);
+    transition:background-color .25s ease;
     color:var(--text);
     font-family:var(--font-body);
     min-height:100vh;
     width:100%;
     overflow-x:hidden;
   }
+
+  /* ================================================================
+     ADDED — BACKGROUND CUSTOMIZATION presets (site-wide).
+     Set via the Background section in the theme/accent popover.
+     Only touches --page-bg-1/2/base, so cards, glass, borders, and
+     the accent system above are completely unaffected.
+     ================================================================ */
+  html[data-bg="midnight"]{ --page-bg-1:rgba(79,140,255,0.07); --page-bg-2:rgba(20,24,46,0.05); --page-bg-base:#05070f; }
+  html[data-bg="cyberpunk"]{ --page-bg-1:rgba(155,107,255,0.10); --page-bg-2:rgba(34,211,238,0.07); --page-bg-base:#0a0612; }
+  html[data-bg="ocean"]{ --page-bg-1:rgba(34,211,238,0.06); --page-bg-2:rgba(47,95,209,0.07); --page-bg-base:#061622; }
+  html[data-bg="forest"]{ --page-bg-1:rgba(16,185,129,0.08); --page-bg-2:rgba(95,191,179,0.05); --page-bg-base:#071b12; }
+  html[data-bg="sunset"]{ --page-bg-1:rgba(249,115,22,0.09); --page-bg-2:rgba(239,68,68,0.06); --page-bg-base:#1a0e08; }
+  html[data-bg="galaxy"]{ --page-bg-1:rgba(155,107,255,0.10); --page-bg-2:rgba(79,140,255,0.05); --page-bg-base:#0d0620; }
   img, svg{ max-width:100%; }
   ::selection{ background:var(--gold); color:var(--bg-deep); }
   button{ font-family:inherit; cursor:pointer; border:none; }
@@ -465,6 +488,35 @@
     letter-spacing:.04em; font-weight:600; transition:border-color .15s, color .15s;
   }
   .accent-popover-reset:hover{ border-color:var(--danger); color:var(--danger); }
+
+  /* ================================================================
+     ADDED — BACKGROUND section inside the same theme/accent popover.
+     Same visual rhythm as the accent swatches above (compact chips),
+     just labeled since background presets aren't guessable from a
+     single dot the way accent colors are.
+     ================================================================ */
+  .bg-preset-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .bg-chip{
+    display:flex; align-items:center; gap:7px; padding:6px 8px; border-radius:8px;
+    border:1px solid var(--glass-border); background:var(--glass-bg); cursor:pointer;
+    font-size:11px; font-weight:600; color:var(--text-muted); text-align:left;
+    transition:border-color .15s cubic-bezier(.22,1,.36,1), color .15s cubic-bezier(.22,1,.36,1), background .15s cubic-bezier(.22,1,.36,1);
+  }
+  .bg-chip:hover{ background:var(--glass-bg-strong); color:var(--text); }
+  .bg-chip.active{ border-color:var(--accent-bright); color:var(--text); background:var(--glass-bg-strong); }
+  .bg-chip-swatch{
+    width:16px; height:16px; border-radius:50%; flex-shrink:0; box-shadow:0 1px 4px rgba(0,0,0,.3);
+    border:1px solid rgba(255,255,255,0.15);
+  }
+
+  .bg-popover-custom{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .bg-custom-input{
+    width:38px; height:28px; border:1px solid var(--glass-border); border-radius:7px;
+    background:none; padding:0; cursor:pointer; flex-shrink:0;
+  }
+  .bg-custom-input::-webkit-color-swatch-wrapper{ padding:2px; }
+  .bg-custom-input::-webkit-color-swatch{ border-radius:5px; border:none; }
+  .bg-custom-input::-moz-color-swatch{ border-radius:5px; border:none; }
 
   .main{ flex:1; width:100%; max-width:1400px; margin:0 auto; padding:36px 44px; }
   .view-head{ margin-bottom:28px; }
