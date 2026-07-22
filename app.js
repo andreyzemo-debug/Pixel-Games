@@ -41,6 +41,12 @@ const I18N = {
     store_title: "Store",
     store_desc:
       "Browse the catalog. Add titles to your library to unlock play.",
+
+    // ADDED — store promo carousel
+    promo_slide_1: "New games are now available for everyone",
+    promo_slide_2: "This space could be your advertisement",
+    promo_slide_3: "Don't miss the chance to buy the latest games",
+
     library_title: "Library",
     library_desc: "Games you own. Hit Play to launch.",
     library_empty_title: "Library Empty",
@@ -228,6 +234,12 @@ const I18N = {
     store_title: "Магазин",
     store_desc:
       "Просматривайте каталог. Добавляйте игры в библиотеку, чтобы играть.",
+
+    // ADDED — store promo carousel
+    promo_slide_1: "Новые игры уже доступны для всех",
+    promo_slide_2: "Это место может стать вашей рекламой",
+    promo_slide_3: "Не упустите шанс купить новейшие игры",
+
     library_title: "Библиотека",
     library_desc:
       "Игры, которыми вы владеете. Нажмите Играть, чтобы запустить.",
@@ -415,6 +427,12 @@ const I18N = {
     store_title: "Do'kon",
     store_desc:
       "Katalogni ko'ring. O'ynash uchun o'yinlarni kutubxonangizga qo'shing.",
+
+    // ADDED — store promo carousel
+    promo_slide_1: "Yangi o'yinlar endi barchaga mavjud",
+    promo_slide_2: "Bu joy sizning reklamangiz bo'lishi mumkin",
+    promo_slide_3: "Eng so'nggi o'yinlarni sotib olish imkoniyatini boy bermang",
+
     library_title: "Kutubxona",
     library_desc:
       "Sizga tegishli o'yinlar. Ishga tushirish uchun O'ynash tugmasini bosing.",
@@ -655,6 +673,52 @@ function selectLanguage(lang) {
 document.addEventListener("DOMContentLoaded", function () {
   applyLanguage(getCurrentLanguage());
 });
+
+/* ============================================================
+   ADDED — STORE PROMO CAROUSEL
+   Auto-rotating hero banner above the store search bar. Slide text
+   is handled by the existing data-i18n system (see I18N above), so
+   it updates automatically whenever applyLanguage() runs.
+   ============================================================ */
+let storePromoCarouselTimer = null;
+let storePromoCarouselIndex = 0;
+
+function goToStorePromoSlide(index) {
+  const track = document.getElementById("storePromoTrack");
+  if (!track) return;
+  const slides = track.querySelectorAll(".promo-slide");
+  const dots = document.querySelectorAll("#storePromoDots .promo-dot");
+  if (!slides.length) return;
+  storePromoCarouselIndex = (index + slides.length) % slides.length;
+  slides.forEach((slide, i) => {
+    slide.classList.toggle("active", i === storePromoCarouselIndex);
+  });
+  dots.forEach((dot, i) => {
+    dot.classList.toggle("active", i === storePromoCarouselIndex);
+  });
+}
+
+function advanceStorePromoSlide() {
+  goToStorePromoSlide(storePromoCarouselIndex + 1);
+}
+
+function initStorePromoCarousel() {
+  const carousel = document.getElementById("storePromoCarousel");
+  if (!carousel) return;
+  goToStorePromoSlide(0);
+  if (storePromoCarouselTimer) clearInterval(storePromoCarouselTimer);
+  storePromoCarouselTimer = setInterval(advanceStorePromoSlide, 5000);
+
+  const dots = document.querySelectorAll("#storePromoDots .promo-dot");
+  dots.forEach((dot) => {
+    dot.addEventListener("click", () => {
+      goToStorePromoSlide(parseInt(dot.dataset.index, 10) || 0);
+      if (storePromoCarouselTimer) clearInterval(storePromoCarouselTimer);
+      storePromoCarouselTimer = setInterval(advanceStorePromoSlide, 5000);
+    });
+  });
+}
+document.addEventListener("DOMContentLoaded", initStorePromoCarousel);
 
 /* ============================================================
    ADDED — FULLSCREEN MODE
@@ -1431,6 +1495,7 @@ const CATALOG = [
   {
     id: "g1",
     title: "SHADOWRITE",
+    image: "assets/games/shadowrite.webp",
     tag: "Shooter",
     color1: "#1e1b2e",
     color2: "#4b2f6b",
@@ -1443,6 +1508,7 @@ const CATALOG = [
   {
     id: "g2",
     title: "AIM BOT",
+    image: "assets/games/aim-bot.webp",
     tag: "Aim Trainer",
     color1: "#16323a",
     color2: "#2f6b63",
@@ -1455,6 +1521,7 @@ const CATALOG = [
   {
     id: "g3",
     title: "MARS OUTPOST",
+    image: "assets/games/mars-outpost.webp",
     tag: "3D Sci-Fi Survival",
     color1: "#5a341f",
     color2: "#c56b2d",
@@ -1467,6 +1534,7 @@ const CATALOG = [
   {
     id: "g4",
     title: "PROJECT: ECHO",
+    image: "assets/games/project-echo.webp",
     tag: "3D Horror Adventure",
     color1: "#2a1f2f",
     color2: "#4a2f52",
@@ -1479,6 +1547,7 @@ const CATALOG = [
   {
     id: "g5",
     title: "NEON DRIFT",
+    image: "assets/games/neon-drift.webp",
     tag: "3D Arcade Racing",
     color1: "#1f2f3a",
     color2: "#2f5a6b",
@@ -1491,6 +1560,7 @@ const CATALOG = [
   {
     id: "g6",
     title: "TREASURE HUNTER",
+    image: "assets/games/treasure-hunter.webp",
     tag: "3D Adventure",
     color1: "#3a2f1f",
     color2: "#6b5a2f",
@@ -1503,6 +1573,7 @@ const CATALOG = [
   {
     id: "g7",
     title: "SKYBOUND",
+    image: "assets/games/skybound.webp",
     tag: "3D Open World Adventure",
     color1: "#2a4f7a",
     color2: "#5bb6ff",
@@ -1515,6 +1586,7 @@ const CATALOG = [
   {
     id: "g8",
     title: "KINGDOM FALL",
+    image: "assets/games/kingdom-fall.webp",
     tag: "3D Action RPG",
     color1: "#4b2c1d",
     color2: "#b67a3d",
@@ -1527,6 +1599,7 @@ const CATALOG = [
   {
     id: "g9",
     title: "PHANTOM OPS",
+    image: "assets/games/phantom-ops.webp",
     tag: "3D Stealth Action",
     color1: "#1f2a35",
     color2: "#3b556e",
@@ -1539,6 +1612,7 @@ const CATALOG = [
   {
     id: "g10",
     title: "LAST HORIZON",
+    image: "assets/games/last-horizon.webp",
     tag: "3D Open World Survival",
     color1: "#4b5d42",
     color2: "#8fa96b",
@@ -1551,6 +1625,7 @@ const CATALOG = [
   {
   id: "g11",
   title: "PIXEL RUSH",
+  image: "assets/games/pixel-rush.webp",
   tag: "Neon Arcade Racing",
   color1: "#151a3d",
   color2: "#8b5cf6",
@@ -1563,6 +1638,7 @@ const CATALOG = [
 {
   id: "g12",
   title: "PIXEL TIC-TAC-TOE",
+  image: "assets/games/pixel-tic-tac-toe.webp",
   tag: "Neon Strategy Classic",
   color1: "#101828",
   color2: "#7c3aed",
@@ -1575,6 +1651,7 @@ const CATALOG = [
 {
   id: "g13",
   title: "PIXEL SNAKE",
+  image: "assets/games/pixel-snake.webp",
   tag: "Neon Arcade Classic",
   color1: "#071a1f",
   color2: "#00e5ff",
@@ -2757,6 +2834,20 @@ function gameMatchesSearch(game, query) {
   );
 }
 
+/* ADDED — short letter mark shown while a game's real cover artwork
+   (g.image) hasn't been added yet. E.g. "MARS OUTPOST" -> "MO". */
+function gameArtMonogram(title) {
+  if (!title) return "?";
+  const letters = title
+    .trim()
+    .split(/\s+/)
+    .map((w) => (w.match(/[A-Za-z0-9]/) || [""])[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+  return letters || "?";
+}
+
 /* Reads and normalizes the current value of a search input. */
 function readSearchQuery(inputId) {
   const el = document.getElementById(inputId);
@@ -2839,7 +2930,11 @@ function renderStore() {
         const buyLabel = `${t("btn_buy")} $${g.price.toFixed(2)}`;
         return `
     <div class="card">
-      <div class="card-art" style="background:linear-gradient(135deg, ${g.color1}, ${g.color2});">
+      <div class="card-art store-art" style="background:linear-gradient(135deg, ${g.color1}, ${g.color2});">
+        <div class="store-art-fallback">
+          <span class="store-art-mono">${gameArtMonogram(g.title)}</span>
+        </div>
+        <img class="store-art-img" src="${g.image}" alt="${g.title}" loading="lazy" decoding="async" onerror="this.style.display='none';" />
         <span class="card-tag">${g.tag}</span>
         <div class="card-icon-row">
           <button class="icon-toggle ${favorites.includes(g.id) ? "on" : ""}" title="Favorite" onclick="toggleFavorite('${g.id}')">★</button>

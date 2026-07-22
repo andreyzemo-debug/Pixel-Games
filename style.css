@@ -541,6 +541,89 @@
   .view-title{ font-family:var(--font-display); font-size:30px; letter-spacing:.02em; }
   .view-desc{ color:var(--text-muted); font-size:13.5px; margin-top:4px; }
 
+  /* ================= STORE PROMO CAROUSEL (added) ================= */
+  .promo-carousel{
+    position:relative; overflow:hidden; isolation:isolate;
+    min-height:380px; margin-bottom:28px;
+    border-radius:22px; border:1px solid var(--glass-border);
+    background:#07060c;
+    box-shadow:0 24px 60px var(--shadow-soft), inset 0 1px 0 rgba(255,255,255,.06);
+  }
+  /* inner vignette for realistic depth on top of the photo */
+  .promo-carousel::after{
+    content:""; position:absolute; inset:0; z-index:4; border-radius:inherit;
+    box-shadow:inset 0 0 90px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.05);
+    pointer-events:none;
+  }
+
+  .promo-carousel-track{ position:relative; z-index:1; width:100%; height:100%; min-height:inherit; }
+
+  .promo-slide{
+    position:absolute; inset:0; border-radius:inherit; overflow:hidden;
+    opacity:0; transform:translateX(22px) scale(1.01);
+    transition:opacity .9s ease, transform .9s ease;
+    pointer-events:none;
+  }
+  .promo-slide.active{ opacity:1; transform:translateX(0) scale(1); pointer-events:auto; z-index:2; }
+
+  .promo-slide-media{ position:absolute; inset:0; overflow:hidden; border-radius:inherit; }
+  .promo-slide-img{
+    width:100%; height:100%; object-fit:cover; object-position:center; display:block;
+    transform:scale(1.08); transition:transform 7s ease-out;
+  }
+  .promo-slide.active .promo-slide-img{ transform:scale(1); }
+
+  /* cinematic dark-to-transparent gradient — guarantees text contrast over any artwork */
+  .promo-slide-scrim{
+    position:absolute; inset:0; z-index:1; border-radius:inherit; pointer-events:none;
+    background:
+      linear-gradient(100deg, rgba(4,3,10,.94) 0%, rgba(4,3,10,.72) 32%, rgba(4,3,10,.22) 62%, rgba(4,3,10,.04) 85%),
+      linear-gradient(180deg, rgba(4,3,10,.1) 0%, rgba(4,3,10,0) 26%, rgba(4,3,10,.4) 82%, rgba(4,3,10,.6) 100%);
+  }
+
+  .promo-slide-content{
+    position:relative; z-index:2; height:100%; max-width:600px;
+    display:flex; flex-direction:column; justify-content:flex-end;
+    padding:38px 44px; gap:10px;
+  }
+  .promo-slide-kicker{
+    font-family:var(--font-display); font-size:12px; font-weight:600;
+    letter-spacing:.2em; text-transform:uppercase; color:var(--accent-bright);
+    text-shadow:0 0 20px rgba(var(--accent-rgb),.65);
+  }
+  .promo-slide-text{
+    font-family:var(--font-display); font-size:34px; line-height:1.28;
+    letter-spacing:.005em; color:#f8f7ff; max-width:520px;
+    text-shadow:0 4px 26px rgba(0,0,0,.75), 0 0 42px rgba(var(--accent-rgb),.22);
+  }
+
+  .promo-carousel-dots{
+    position:absolute; left:0; right:0; bottom:16px; z-index:5;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+  }
+  .promo-dot{
+    width:7px; height:7px; border-radius:50%; background:rgba(255,255,255,.35); cursor:pointer;
+    box-shadow:0 1px 4px rgba(0,0,0,.4);
+    transition:background .2s ease, transform .2s ease, width .2s ease;
+  }
+  .promo-dot.active{ width:22px; border-radius:4px; background:linear-gradient(90deg, var(--accent), var(--accent-bright)); box-shadow:0 0 12px rgba(var(--accent-rgb),.6); }
+  .promo-dot:hover{ background:rgba(255,255,255,.6); }
+
+  @media (max-width:900px){
+    .promo-carousel{ min-height:300px; }
+    .promo-slide-content{ padding:30px 32px; max-width:100%; }
+    .promo-slide-text{ font-size:26px; max-width:420px; }
+  }
+  @media (max-width:640px){
+    .promo-carousel{ min-height:230px; border-radius:16px; }
+    .promo-slide-content{ padding:22px 20px; gap:6px; }
+    .promo-slide-kicker{ font-size:10px; letter-spacing:.16em; }
+    .promo-slide-text{ font-size:18px; line-height:1.35; max-width:100%; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .promo-slide, .promo-slide-img{ transition:opacity .4s ease; transform:none !important; }
+  }
+
   /* ================= SEARCH BAR (added) ================= */
   .search-bar-wrap{ margin-bottom:24px; }
   .search-bar{
@@ -616,13 +699,47 @@
   .btn-sm.play:hover{ filter:brightness(1.1); }
 
   /* ---- added: wishlist / favorite icon toggles on cards ---- */
-  .card-icon-row{ position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:2; }
+  .card-icon-row{ position:absolute; top:10px; right:10px; display:flex; gap:6px; z-index:3; }
   .icon-toggle{
     width:26px; height:26px; border-radius:50%; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.1);
     color:#fff; font-size:12px; display:flex; align-items:center; justify-content:center; transition:all .15s;
   }
   .icon-toggle:hover{ transform:scale(1.1); }
   .icon-toggle.on{ background:var(--gold); color:#1a1508; border-color:transparent; }
+
+  /* ================= STORE CARD ARTWORK (added) =================
+     Scoped to .store-art only, so Library cards keep their original
+     compact art block untouched. Ready for real cover images dropped
+     into assets/games/ — falls back to an elegant monogram + the
+     existing gradient until a real file exists at that path. */
+  .store-art{
+    height:auto; aspect-ratio:16/9; min-height:150px;
+    align-items:flex-end; padding:12px;
+  }
+  .card-tag{ position:relative; z-index:3; }
+  .store-art-fallback{
+    position:absolute; inset:0; z-index:0;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+  }
+  .store-art-fallback::before{
+    content:''; position:absolute; width:78px; height:78px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.22);
+  }
+  .store-art-fallback::after{
+    content:''; position:absolute; width:104px; height:104px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.1);
+  }
+  .store-art-mono{
+    position:relative; font-family:var(--font-display); font-size:30px; letter-spacing:.04em;
+    color:rgba(255,255,255,.55); text-shadow:0 2px 10px rgba(0,0,0,.3);
+  }
+  .store-art-img{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:1;
+    border-radius:inherit; transition:transform .5s cubic-bezier(.2,.7,.3,1), filter .3s ease;
+  }
+  .card:hover .store-art-img{ transform:scale(1.07); }
+  .store-art::after{ z-index:2; }
 
   .empty-state{
     border:1px dashed var(--line); border-radius:var(--radius); padding:50px 24px;
