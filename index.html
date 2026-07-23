@@ -601,7 +601,7 @@
       </div>
 
       <!-- ================= PLAYER STATISTICS (added) ================= -->
-      <div class="section-subtitle" data-i18n="player_stats_heading">Player Statistics</div>
+      <div class="section-subtitle" id="statisticsSection" data-i18n="player_stats_heading">Player Statistics</div>
       <div class="player-stats-grid">
         <div class="glass-card player-stat-card">
           <div class="player-stat-icon">🎮</div>
@@ -648,7 +648,7 @@
       <div class="achievements-grid" id="achievementsGrid"></div>
 
       <!-- ================= PROFILE BADGES (added) ================= -->
-      <div class="section-subtitle" data-i18n="badges_heading">Profile Badges</div>
+      <div class="section-subtitle" id="badgesSection" data-i18n="badges_heading">Profile Badges</div>
       <div class="badges-grid" id="badgesGrid"></div>
 
       <!-- ================= PLAY TIME (added) ================= -->
@@ -903,6 +903,69 @@
       <div class="friends-grid" id="playerDirectoryGrid"></div>
     </div>
   </div>
+
+  <!-- ================= PREMIUM FOOTER (added) =================
+       Sibling of .main inside the flex-column #appShell, so it sits
+       as the final section below whichever view is active — no
+       per-view duplication needed. Links reuse existing switchView()/
+       toast()/toggleAIPanel() plumbing; nothing here is a dead link. -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div class="footer-col footer-col-brand">
+          <div class="footer-brand">Pixel<span>&amp;Games</span></div>
+          <div class="footer-brand-desc" data-i18n="footer_desc">Discover, play, and experience unforgettable games.</div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_heading_store">Store</div>
+          <button type="button" class="footer-link" onclick="footerGoTo('store')" data-i18n="footer_link_browse_games">Browse Games</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('store','storeCategoryFilters')" data-i18n="footer_link_categories">Categories</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('store','gameOfTheDayCard')" data-i18n="footer_link_game_of_day">Game of the Day</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('store','recentlyPlayedSection')" data-i18n="footer_link_recently_played">Recently Played</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('wallet','mysteryBoxCard')" data-i18n="footer_link_mystery_box">Mystery Box</button>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_heading_community">Community</div>
+          <button type="button" class="footer-link" onclick="footerComingSoon()" data-i18n="footer_link_news">News</button>
+          <button type="button" class="footer-link" onclick="footerComingSoon()" data-i18n="footer_link_updates">Updates</button>
+          <button type="button" class="footer-link" onclick="footerComingSoon()" data-i18n="footer_link_community">Community</button>
+          <button type="button" class="footer-link" onclick="footerComingSoon()" data-i18n="footer_link_discord">Discord</button>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_heading_account">Account</div>
+          <button type="button" class="footer-link" onclick="footerGoTo('profile')" data-i18n="footer_link_profile">Profile</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('library')" data-i18n="footer_link_library">Library</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('profile','statisticsSection')" data-i18n="footer_link_statistics">Statistics</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('profile','badgesSection')" data-i18n="footer_link_badges">Badges</button>
+          <button type="button" class="footer-link" onclick="footerGoTo('profile','premiumCard')" data-i18n="footer_link_premium">Premium</button>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-col-title" data-i18n="footer_heading_support">Support</div>
+          <button type="button" class="footer-link" onclick="footerOpenSupport()" data-i18n="footer_link_help_center">Help Center</button>
+          <button type="button" class="footer-link" onclick="footerComingSoon()" data-i18n="footer_link_faq">FAQ</button>
+          <button type="button" class="footer-link" onclick="footerOpenSupport()" data-i18n="footer_link_contact">Contact</button>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div class="footer-copyright" data-i18n="footer_copyright">© 2026 Pixel&amp;Games. All rights reserved.</div>
+
+        <!-- ================= FOOTER LANGUAGE SWITCH (added) —
+             reuses the existing .theme-swatch/.lang-swatch system and
+             selectLanguage(), so it stays in sync with the language
+             screen and the Profile settings switcher automatically. -->
+        <div class="footer-lang-switch" id="footerLangSwitches">
+          <button type="button" class="theme-swatch lang-swatch" data-lang="en" onclick="selectLanguage('en')">English</button>
+          <button type="button" class="theme-swatch lang-swatch" data-lang="ru" onclick="selectLanguage('ru')">Русский</button>
+          <button type="button" class="theme-swatch lang-swatch" data-lang="uz" onclick="selectLanguage('uz')">O'zbekcha</button>
+        </div>
+      </div>
+    </div>
+  </footer>
 </div>
 
 <!-- Modal mount point -->

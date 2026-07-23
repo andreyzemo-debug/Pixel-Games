@@ -272,6 +272,33 @@ const I18N = {
     badge_premium_player_desc: "Become a Premium member.",
     badge_game_collector_name: "Game Collector",
     badge_game_collector_desc: "Play or own 8 different games.",
+
+    // ADDED — Premium Footer
+    footer_desc: "Discover, play, and experience unforgettable games.",
+    footer_heading_store: "Store",
+    footer_link_browse_games: "Browse Games",
+    footer_link_categories: "Categories",
+    footer_link_game_of_day: "Game of the Day",
+    footer_link_recently_played: "Recently Played",
+    footer_link_mystery_box: "Mystery Box",
+    footer_heading_community: "Community",
+    footer_link_news: "News",
+    footer_link_updates: "Updates",
+    footer_link_community: "Community",
+    footer_link_discord: "Discord",
+    footer_heading_account: "Account",
+    footer_link_profile: "Profile",
+    footer_link_library: "Library",
+    footer_link_statistics: "Statistics",
+    footer_link_badges: "Badges",
+    footer_link_premium: "Premium",
+    footer_heading_support: "Support",
+    footer_link_help_center: "Help Center",
+    footer_link_faq: "FAQ",
+    footer_link_contact: "Contact",
+    footer_language_label: "Language",
+    footer_copyright: "© 2026 Pixel&Games. All rights reserved.",
+    footer_coming_soon: "Coming soon",
   },
   ru: {
     lang_select_title: "Выберите язык",
@@ -537,6 +564,33 @@ const I18N = {
     badge_premium_player_desc: "Станьте Premium-пользователем.",
     badge_game_collector_name: "Коллекционер игр",
     badge_game_collector_desc: "Сыграйте или владейте 8 разными играми.",
+
+    // ADDED — Premium Footer
+    footer_desc: "Открывай, играй и получай незабываемые впечатления.",
+    footer_heading_store: "Магазин",
+    footer_link_browse_games: "Все игры",
+    footer_link_categories: "Категории",
+    footer_link_game_of_day: "Игра дня",
+    footer_link_recently_played: "Недавно сыгранные",
+    footer_link_mystery_box: "Таинственная коробка",
+    footer_heading_community: "Сообщество",
+    footer_link_news: "Новости",
+    footer_link_updates: "Обновления",
+    footer_link_community: "Сообщество",
+    footer_link_discord: "Discord",
+    footer_heading_account: "Аккаунт",
+    footer_link_profile: "Профиль",
+    footer_link_library: "Библиотека",
+    footer_link_statistics: "Статистика",
+    footer_link_badges: "Значки",
+    footer_link_premium: "Премиум",
+    footer_heading_support: "Поддержка",
+    footer_link_help_center: "Центр помощи",
+    footer_link_faq: "Вопросы и ответы",
+    footer_link_contact: "Контакты",
+    footer_language_label: "Язык",
+    footer_copyright: "© 2026 Pixel&Games. Все права защищены.",
+    footer_coming_soon: "Скоро",
   },
   uz: {
     lang_select_title: "Tilni tanlang",
@@ -802,6 +856,33 @@ const I18N = {
     badge_premium_player_desc: "Premium a'zo bo'ling.",
     badge_game_collector_name: "O'yin kolleksioneri",
     badge_game_collector_desc: "8 ta turli o'yinni o'ynang yoki egallang.",
+
+    // ADDED — Premium Footer
+    footer_desc: "Kashf eting, o'ynang va unutilmas tajribani his qiling.",
+    footer_heading_store: "Do'kon",
+    footer_link_browse_games: "O'yinlarni ko'rish",
+    footer_link_categories: "Toifalar",
+    footer_link_game_of_day: "Kunning o'yini",
+    footer_link_recently_played: "Yaqinda o'ynalgan",
+    footer_link_mystery_box: "Sirli quti",
+    footer_heading_community: "Hamjamiyat",
+    footer_link_news: "Yangiliklar",
+    footer_link_updates: "Yangilanishlar",
+    footer_link_community: "Hamjamiyat",
+    footer_link_discord: "Discord",
+    footer_heading_account: "Hisob",
+    footer_link_profile: "Profil",
+    footer_link_library: "Kutubxona",
+    footer_link_statistics: "Statistika",
+    footer_link_badges: "Nishonlar",
+    footer_link_premium: "Premium",
+    footer_heading_support: "Yordam",
+    footer_link_help_center: "Yordam markazi",
+    footer_link_faq: "Ko'p so'raladigan savollar",
+    footer_link_contact: "Aloqa",
+    footer_language_label: "Til",
+    footer_copyright: "© 2026 Pixel&Games. Barcha huquqlar himoyalangan.",
+    footer_coming_soon: "Tez orada",
   },
 };
 
@@ -3418,6 +3499,38 @@ function switchView(view) {
   if (view === "partnership") renderPartnershipView();
   if (view === "advertisements") renderAdvertisementsView();
   renderCoinsBadge();
+}
+
+/* ============================================================
+   ADDED — PREMIUM FOOTER
+   Reuses the existing switchView()/toast()/toggleAIPanel() system —
+   no new routing, no new panels. footerGoTo() switches to the target
+   view (re-using existing nav logic) then smooth-scrolls to the
+   in-page section that already renders there, once the view's render
+   function has finished updating the DOM.
+   ============================================================ */
+function footerGoTo(view, anchorId) {
+  switchView(view);
+  if (!anchorId) return;
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const el = document.getElementById(anchorId);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+}
+
+/* Community links (News/Updates/Community/Discord) and the FAQ have no
+   dedicated page yet — rather than link to a broken destination, this
+   surfaces the same toast pattern already used across the site. */
+function footerComingSoon() {
+  toast(t("footer_coming_soon"));
+}
+
+/* Help Center / Contact route to the existing Pixel AI assistant,
+   the site's current support channel. */
+function footerOpenSupport() {
+  toggleAIPanel(true);
 }
 
 /* ================= SEARCH SYSTEM (added) =================
