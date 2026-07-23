@@ -362,6 +362,18 @@
         </div>
       </div>
 
+      <!-- ================= GAME OF THE DAY (added) ================= -->
+      <div class="gotd-card" id="gameOfTheDayCard"></div>
+
+      <!-- ================= RECENTLY PLAYED (added) ================= -->
+      <div class="recently-played-section" id="recentlyPlayedSection">
+        <div class="view-head recently-played-head">
+          <div class="view-title" data-i18n="recently_played_title">Recently Played</div>
+          <div class="view-desc" data-i18n="recently_played_desc">Jump back into your recent games.</div>
+        </div>
+        <div class="grid recently-played-grid" id="recentlyPlayedGrid"></div>
+      </div>
+
       <!-- ================= STORE SEARCH (added) ================= -->
       <div class="search-bar-wrap">
         <div class="search-bar">
@@ -371,8 +383,12 @@
         </div>
       </div>
 
+      <!-- ================= GAME CATEGORY FILTERS (added) ================= -->
+      <div class="category-filters" id="storeCategoryFilters"></div>
+
       <div class="grid" id="storeGrid"></div>
     </div>
+
 
     <!-- LIBRARY VIEW -->
     <div id="libraryView" class="hidden">
@@ -411,6 +427,17 @@
         <div class="daily-bonus-reward" data-i18n="daily_bonus_reward">+50 Coins</div>
         <button class="btn-sm gold daily-bonus-btn" id="dailyBonusBtn" onclick="claimDailyBonus()" data-i18n="daily_bonus_claim_btn">Claim Reward</button>
         <div class="daily-bonus-timer" id="dailyBonusTimer"></div>
+      </div>
+
+      <!-- ================= MYSTERY BOX (added) ================= -->
+      <div class="glass-card mystery-box-card" id="mysteryBoxCard">
+        <div class="mystery-box-art" id="mysteryBoxArt">🎁</div>
+        <div class="mystery-box-info">
+          <div class="mystery-box-title" data-i18n="mystery_box_title">Mystery Box</div>
+          <div class="mystery-box-desc" data-i18n="mystery_box_desc">Open one free box every day for a random reward.</div>
+          <div class="mystery-box-status" id="mysteryBoxStatus"></div>
+        </div>
+        <button class="btn-sm gold mystery-box-btn" id="mysteryBoxBtn" onclick="openMysteryBox()" data-i18n="mystery_box_open_btn">Open Box</button>
       </div>
 
       <div class="wallet-layout">
@@ -544,6 +571,7 @@
           <div class="profile-hero-name-row">
             <div class="profile-hero-name" id="heroNick">—</div>
             <span class="premium-pill hidden" id="heroPremiumPill">👑 PREMIUM</span>
+            <span class="favorite-badge-pill hidden" id="heroFavoriteBadgePill"></span>
           </div>
           <div class="profile-hero-mail" id="heroMail">—</div>
           <!-- ================= COUNTRY (added) ================= -->
@@ -572,6 +600,33 @@
         <div class="glass-card info-chip"><div class="profile-label" data-i18n="member_since_label">Member Since</div><div class="profile-val" id="statCreated">—</div></div>
       </div>
 
+      <!-- ================= PLAYER STATISTICS (added) ================= -->
+      <div class="section-subtitle" data-i18n="player_stats_heading">Player Statistics</div>
+      <div class="player-stats-grid">
+        <div class="glass-card player-stat-card">
+          <div class="player-stat-icon">🎮</div>
+          <div class="player-stat-value" id="pstatGamesPlayed">0</div>
+          <div class="player-stat-label" data-i18n="pstat_games_played">Games Played</div>
+        </div>
+        <div class="glass-card player-stat-card">
+          <div class="player-stat-icon">⏱️</div>
+          <div class="player-stat-value" id="pstatTotalPlaytime">0m</div>
+          <div class="player-stat-label" data-i18n="pstat_total_playtime">Total Playtime</div>
+        </div>
+        <div class="glass-card player-stat-card">
+          <div class="player-stat-icon">🪙</div>
+          <div class="player-stat-value" id="pstatCoinsEarned">0</div>
+          <div class="player-stat-label" data-i18n="pstat_coins_earned">Coins Earned</div>
+        </div>
+        <div class="glass-card player-stat-card">
+          <div class="player-stat-icon">🎁</div>
+          <div class="player-stat-value" id="pstatMysteryBoxes">0</div>
+          <div class="player-stat-label" data-i18n="pstat_mystery_boxes">Mystery Boxes Opened</div>
+        </div>
+      </div>
+      <div class="player-stats-recent-label" data-i18n="pstat_recently_played">Recently Played Games</div>
+      <div class="player-stats-recent-list" id="playerStatsRecentList"></div>
+
       <!-- ================= PREMIUM (added) ================= -->
       <div class="section-subtitle" data-i18n="premium_heading">Pixel&amp;Games Premium</div>
       <div class="glass-card premium-card" id="premiumCard">
@@ -591,6 +646,10 @@
 
       <div class="section-subtitle" data-i18n="achievements_heading">Achievements</div>
       <div class="achievements-grid" id="achievementsGrid"></div>
+
+      <!-- ================= PROFILE BADGES (added) ================= -->
+      <div class="section-subtitle" data-i18n="badges_heading">Profile Badges</div>
+      <div class="badges-grid" id="badgesGrid"></div>
 
       <!-- ================= PLAY TIME (added) ================= -->
       <div class="section-subtitle" data-i18n="playtime_heading">Play Time</div>

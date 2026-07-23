@@ -204,6 +204,55 @@ const I18N = {
     search_placeholder: "Search games...",
     search_no_results_store: "No games found.",
     search_no_results_library: "No games found in your library.",
+
+    // ADDED — Recently Played
+    recently_played_title: "Recently Played",
+    recently_played_desc: "Jump back into your recent games.",
+    recently_played_empty_title: "No games played yet",
+    recently_played_empty_desc:
+      "Launch a game from your Library and it'll show up here.",
+    btn_play_again: "Play Again",
+
+    // ADDED — Mystery Box
+    mystery_box_title: "Mystery Box",
+    mystery_box_desc: "Open one free box every day for a random reward.",
+    mystery_box_open_btn: "Open Box",
+    mystery_box_come_back: "Come back tomorrow for another Mystery Box",
+    mystery_box_congrats: "Congratulations!",
+    mystery_box_you_received: "You received",
+
+    // ADDED — Game of the Day
+    game_of_the_day_title: "Game of the Day",
+
+    // ADDED — Category filters
+    category_all: "All",
+
+    // ADDED — Player Statistics
+    player_stats_heading: "Player Statistics",
+    pstat_games_played: "Games Played",
+    pstat_total_playtime: "Total Playtime",
+    pstat_coins_earned: "Coins Earned",
+    pstat_mystery_boxes: "Mystery Boxes Opened",
+    pstat_recently_played: "Recently Played Games",
+
+    // ADDED — Profile Badges
+    badges_heading: "Profile Badges",
+    badge_state_locked: "Locked",
+    badge_state_unlocked: "Unlocked",
+    badge_unlocked_toast: "Badge unlocked",
+    badge_select_favorite_hint: "Click to display on your profile",
+    badge_first_player_name: "First Player",
+    badge_first_player_desc: "Launch your first game.",
+    badge_game_explorer_name: "Game Explorer",
+    badge_game_explorer_desc: "Play 5 different games.",
+    badge_mystery_hunter_name: "Mystery Hunter",
+    badge_mystery_hunter_desc: "Open a Mystery Box.",
+    badge_coin_collector_name: "Coin Collector",
+    badge_coin_collector_desc: "Earn 1,000 Coins in total.",
+    badge_premium_player_name: "Premium Player",
+    badge_premium_player_desc: "Become a Premium member.",
+    badge_game_collector_name: "Game Collector",
+    badge_game_collector_desc: "Play or own 8 different games.",
   },
   ru: {
     lang_select_title: "Выберите язык",
@@ -400,6 +449,56 @@ const I18N = {
     search_placeholder: "Поиск игр...",
     search_no_results_store: "Игры не найдены.",
     search_no_results_library: "В вашей библиотеке игры не найдены.",
+
+    // ADDED — Recently Played
+    recently_played_title: "Недавно сыгранные",
+    recently_played_desc: "Вернитесь к своим недавним играм.",
+    recently_played_empty_title: "Вы ещё не играли",
+    recently_played_empty_desc:
+      "Запустите игру из библиотеки, и она появится здесь.",
+    btn_play_again: "Играть снова",
+
+    // ADDED — Mystery Box
+    mystery_box_title: "Таинственная коробка",
+    mystery_box_desc:
+      "Открывайте одну бесплатную коробку каждый день и получайте случайную награду.",
+    mystery_box_open_btn: "Открыть коробку",
+    mystery_box_come_back: "Возвращайтесь завтра за новой коробкой",
+    mystery_box_congrats: "Поздравляем!",
+    mystery_box_you_received: "Вы получили",
+
+    // ADDED — Game of the Day
+    game_of_the_day_title: "Игра дня",
+
+    // ADDED — Category filters
+    category_all: "Все",
+
+    // ADDED — Player Statistics
+    player_stats_heading: "Статистика игрока",
+    pstat_games_played: "Сыграно игр",
+    pstat_total_playtime: "Общее время игры",
+    pstat_coins_earned: "Заработано монет",
+    pstat_mystery_boxes: "Открыто коробок",
+    pstat_recently_played: "Недавно сыгранные игры",
+
+    // ADDED — Profile Badges
+    badges_heading: "Значки профиля",
+    badge_state_locked: "Заблокировано",
+    badge_state_unlocked: "Разблокировано",
+    badge_unlocked_toast: "Значок разблокирован",
+    badge_select_favorite_hint: "Нажмите, чтобы показать в профиле",
+    badge_first_player_name: "Первый игрок",
+    badge_first_player_desc: "Запустите свою первую игру.",
+    badge_game_explorer_name: "Исследователь игр",
+    badge_game_explorer_desc: "Сыграйте в 5 разных игр.",
+    badge_mystery_hunter_name: "Охотник за тайнами",
+    badge_mystery_hunter_desc: "Откройте таинственную коробку.",
+    badge_coin_collector_name: "Коллекционер монет",
+    badge_coin_collector_desc: "Заработайте 1000 монет в сумме.",
+    badge_premium_player_name: "Премиум игрок",
+    badge_premium_player_desc: "Станьте Premium-пользователем.",
+    badge_game_collector_name: "Коллекционер игр",
+    badge_game_collector_desc: "Сыграйте или владейте 8 разными играми.",
   },
   uz: {
     lang_select_title: "Tilni tanlang",
@@ -596,6 +695,56 @@ const I18N = {
     search_placeholder: "O'yinlarni qidirish...",
     search_no_results_store: "O'yinlar topilmadi.",
     search_no_results_library: "Kutubxonangizda o'yinlar topilmadi.",
+
+    // ADDED — Recently Played
+    recently_played_title: "Yaqinda o'ynalgan",
+    recently_played_desc: "So'nggi o'yinlaringizga qayting.",
+    recently_played_empty_title: "Hali hech qanday o'yin o'ynalmagan",
+    recently_played_empty_desc:
+      "Kutubxonadan o'yin ishga tushiring va u shu yerda paydo bo'ladi.",
+    btn_play_again: "Yana o'ynash",
+
+    // ADDED — Mystery Box
+    mystery_box_title: "Sirli quti",
+    mystery_box_desc:
+      "Har kuni bitta bepul qutini oching va tasodifiy mukofot oling.",
+    mystery_box_open_btn: "Qutini ochish",
+    mystery_box_come_back: "Yana bir sirli quti uchun ertaga qayting",
+    mystery_box_congrats: "Tabriklaymiz!",
+    mystery_box_you_received: "Siz oldingiz",
+
+    // ADDED — Game of the Day
+    game_of_the_day_title: "Kunning o'yini",
+
+    // ADDED — Category filters
+    category_all: "Barchasi",
+
+    // ADDED — Player Statistics
+    player_stats_heading: "O'yinchi statistikasi",
+    pstat_games_played: "O'ynalgan o'yinlar",
+    pstat_total_playtime: "Jami o'yin vaqti",
+    pstat_coins_earned: "Ishlab topilgan tangalar",
+    pstat_mystery_boxes: "Ochilgan qutilar",
+    pstat_recently_played: "Yaqinda o'ynalgan o'yinlar",
+
+    // ADDED — Profile Badges
+    badges_heading: "Profil nishonlari",
+    badge_state_locked: "Qulflangan",
+    badge_state_unlocked: "Ochilgan",
+    badge_unlocked_toast: "Nishon ochildi",
+    badge_select_favorite_hint: "Profilingizda ko'rsatish uchun bosing",
+    badge_first_player_name: "Birinchi o'yinchi",
+    badge_first_player_desc: "Birinchi o'yiningizni ishga tushiring.",
+    badge_game_explorer_name: "O'yin tadqiqotchisi",
+    badge_game_explorer_desc: "5 ta turli o'yinni o'ynang.",
+    badge_mystery_hunter_name: "Sir ovchisi",
+    badge_mystery_hunter_desc: "Sirli qutini oching.",
+    badge_coin_collector_name: "Tanga yig'uvchi",
+    badge_coin_collector_desc: "Jami 1000 tanga ishlab toping.",
+    badge_premium_player_name: "Premium o'yinchi",
+    badge_premium_player_desc: "Premium a'zo bo'ling.",
+    badge_game_collector_name: "O'yin kolleksioneri",
+    badge_game_collector_desc: "8 ta turli o'yinni o'ynang yoki egallang.",
   },
 };
 
@@ -1842,6 +1991,74 @@ const ACHIEVEMENTS = [
 ];
 
 /* ============================================================
+   ADDED — PROFILE BADGES
+   Separate from ACHIEVEMENTS (no Coins reward, just a collectible
+   profile flair) but reuses the exact same user fields already
+   tracked elsewhere (library, premium, playedGameIds, coins, etc).
+   ============================================================ */
+const BADGES = [
+  {
+    id: "first_player",
+    icon: "🎮",
+    nameKey: "badge_first_player_name",
+    descKey: "badge_first_player_desc",
+    target: 1,
+    progress: (u) => Math.min((u.playedGameIds || []).length, 1),
+    check: (u) => (u.playedGameIds || []).length >= 1,
+  },
+  {
+    id: "game_explorer",
+    icon: "🔥",
+    nameKey: "badge_game_explorer_name",
+    descKey: "badge_game_explorer_desc",
+    target: 5,
+    progress: (u) => Math.min((u.playedGameIds || []).length, 5),
+    check: (u) => (u.playedGameIds || []).length >= 5,
+  },
+  {
+    id: "mystery_hunter",
+    icon: "🎁",
+    nameKey: "badge_mystery_hunter_name",
+    descKey: "badge_mystery_hunter_desc",
+    target: 1,
+    progress: (u) => Math.min(u.mysteryBoxesOpened || 0, 1),
+    check: (u) => (u.mysteryBoxesOpened || 0) >= 1,
+  },
+  {
+    id: "coin_collector_badge",
+    icon: "💰",
+    nameKey: "badge_coin_collector_name",
+    descKey: "badge_coin_collector_desc",
+    target: 1000,
+    progress: (u) => Math.min(u.totalCoinsEarned || 0, 1000),
+    check: (u) => (u.totalCoinsEarned || 0) >= 1000,
+  },
+  {
+    id: "premium_player",
+    icon: "💎",
+    nameKey: "badge_premium_player_name",
+    descKey: "badge_premium_player_desc",
+    target: 1,
+    progress: (u) => (u.premium ? 1 : 0),
+    check: (u) => !!u.premium,
+  },
+  {
+    id: "game_collector_badge",
+    icon: "🏆",
+    nameKey: "badge_game_collector_name",
+    descKey: "badge_game_collector_desc",
+    target: 8,
+    progress: (u) =>
+      Math.min(
+        Math.max((u.playedGameIds || []).length, (u.library || []).length),
+        8,
+      ),
+    check: (u) =>
+      Math.max((u.playedGameIds || []).length, (u.library || []).length) >= 8,
+  },
+];
+
+/* ============================================================
    ADDED — COINS, PREMIUM, DAILY BONUS constants
    ============================================================ */
 const COINS_FROM_DAILY_BONUS = 50;
@@ -1855,9 +2072,28 @@ const COINS_PER_MINUTE_PLAYED = 2;
 const COINS_PER_ACHIEVEMENT = 25;
 const COINS_FROM_FREE_ADD = 5;
 const COINS_PER_DOLLAR_SPENT = 3;
+
+/* ============================================================
+   ADDED — RECENTLY PLAYED + MYSTERY BOX constants
+   ============================================================ */
+const RECENTLY_PLAYED_MAX = 6;
+const MYSTERY_BOX_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+// Balanced weighted reward table — bigger payouts are rarer.
+const MYSTERY_BOX_REWARDS = [
+  { amount: 50, weight: 35 },
+  { amount: 100, weight: 30 },
+  { amount: 250, weight: 20 },
+  { amount: 500, weight: 10 },
+  { amount: 1000, weight: 5 },
+];
 const PREMIUM_PRICE = 4.99;
 const DAILY_BONUS_COOLDOWN_MS = 24 * 60 * 60 * 1000;
 const MIN_TRACKED_SESSION_MS = 3000; // ignore accidental instant focus bounces
+
+/* ============================================================
+   ADDED — GAME CATEGORY FILTER (Store)
+   ============================================================ */
+let currentStoreCategory = "All";
 
 const TOPUP_PRESETS = [5, 10, 25, 50, 100];
 let selectedTopupAmount = 10;
@@ -2242,6 +2478,14 @@ function ensureUserDefaults(user) {
     // day so it is never re-requested on every page load.
     lastSeenAt: null,
     aiGreetingCache: null, // { date: "YYYY-MM-DD", text: "..." }
+    // ADDED — Recently Played, Mystery Box
+    recentlyPlayed: [],
+    lastMysteryBoxAt: null,
+    // ADDED — Player Statistics, Profile Badges
+    playedGameIds: [],
+    mysteryBoxesOpened: 0,
+    unlockedBadgeIds: [],
+    favoriteBadgeId: null,
   };
   Object.keys(defaults).forEach((key) => {
     if (user[key] === undefined) {
@@ -2249,6 +2493,14 @@ function ensureUserDefaults(user) {
       changed = true;
     }
   });
+  // ADDED — lifetime Coins-earned counter for Player Statistics. Seeded
+  // from the account's current balance the first time this runs, so an
+  // existing account isn't shown "0 Coins Earned" despite already
+  // holding Coins; every grant afterwards adds on top via grantCoins().
+  if (user.totalCoinsEarned === undefined) {
+    user.totalCoinsEarned = user.coins || 0;
+    changed = true;
+  }
   return changed;
 }
 function persistCurrentUser(mutatorFn) {
@@ -2266,6 +2518,19 @@ function persistCurrentUser(mutatorFn) {
   // last-known-server value instead of trusting the exchange form.
   syncCoinsToServer(u);
   return u;
+}
+
+/* ============================================================
+   ADDED — shared helper for every Coins grant in the app. Keeps the
+   spendable balance (uu.coins) exactly as before, and additionally
+   accumulates a lifetime total (uu.totalCoinsEarned) used by the
+   Player Statistics "Coins Earned" card — spending/exchanging coins
+   only touches uu.coins, never this lifetime counter.
+   ============================================================ */
+function grantCoins(uu, amount) {
+  if (!amount) return;
+  uu.coins = (uu.coins || 0) + amount;
+  uu.totalCoinsEarned = (uu.totalCoinsEarned || 0) + amount;
 }
 
 /* ============================================================
@@ -2534,7 +2799,7 @@ function activatePremium() {
     uu.wallet = Math.round((uu.wallet - PREMIUM_PRICE) * 100) / 100;
     uu.premium = true;
     uu.premiumSince = Date.now();
-    uu.coins = (uu.coins || 0) + COINS_FROM_PREMIUM;
+    grantCoins(uu, COINS_FROM_PREMIUM);
   });
   toast("Premium activated! Welcome to Pixel&Games Premium 👑");
   notifyNewAchievements(u);
@@ -2599,12 +2864,125 @@ function claimDailyBonus() {
   }
   const u = persistCurrentUser((uu) => {
     uu.lastDailyBonusAt = now;
-    uu.coins = (uu.coins || 0) + COINS_FROM_DAILY_BONUS;
+    grantCoins(uu, COINS_FROM_DAILY_BONUS);
   });
   toast(`+${COINS_FROM_DAILY_BONUS} Coins claimed!`);
   notifyNewAchievements(u);
   renderCoinsBadge();
   renderWallet();
+}
+
+/* ============================================================
+   ADDED — MYSTERY BOX
+   One free box per calendar 24h, weighted random Coins reward,
+   persisted via the same persistCurrentUser()/Coins system used
+   everywhere else (no separate Coins ledger).
+   ============================================================ */
+let mysteryBoxInterval = null;
+
+function stopMysteryBoxCountdown() {
+  if (mysteryBoxInterval) {
+    clearInterval(mysteryBoxInterval);
+    mysteryBoxInterval = null;
+  }
+}
+
+function pickMysteryBoxReward() {
+  const total = MYSTERY_BOX_REWARDS.reduce((sum, r) => sum + r.weight, 0);
+  let roll = Math.random() * total;
+  for (const r of MYSTERY_BOX_REWARDS) {
+    if (roll < r.weight) return r;
+    roll -= r.weight;
+  }
+  return MYSTERY_BOX_REWARDS[0];
+}
+
+function renderMysteryBoxCard() {
+  const card = document.getElementById("mysteryBoxCard");
+  const btn = document.getElementById("mysteryBoxBtn");
+  const artEl = document.getElementById("mysteryBoxArt");
+  const statusEl = document.getElementById("mysteryBoxStatus");
+  if (!card || !btn) return;
+  const user = currentUser();
+  if (!user) return;
+  ensureUserDefaults(user);
+  stopMysteryBoxCountdown();
+  card.classList.remove(
+    "mystery-box-shaking",
+    "mystery-box-reveal",
+    "opened",
+  );
+
+  const last = user.lastMysteryBoxAt;
+  const remaining = last ? last + MYSTERY_BOX_COOLDOWN_MS - Date.now() : 0;
+
+  if (!last || remaining <= 0) {
+    if (artEl) artEl.textContent = "🎁";
+    btn.disabled = false;
+    btn.textContent = t("mystery_box_open_btn");
+    if (statusEl) statusEl.innerHTML = "";
+  } else {
+    card.classList.add("opened");
+    if (artEl) artEl.textContent = "🔒";
+    btn.disabled = true;
+    btn.textContent = t("mystery_box_open_btn");
+
+    function update() {
+      const rem = last + MYSTERY_BOX_COOLDOWN_MS - Date.now();
+      if (rem <= 0) {
+        renderMysteryBoxCard();
+        return;
+      }
+      const h = Math.floor(rem / 3600000);
+      const m = Math.floor((rem % 3600000) / 60000);
+      const s = Math.floor((rem % 60000) / 1000);
+      if (statusEl) {
+        statusEl.innerHTML = `<span class="mystery-box-comeback">${t("mystery_box_come_back")}</span><br>${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+      }
+    }
+    update();
+    mysteryBoxInterval = setInterval(update, 1000);
+  }
+}
+
+function openMysteryBox() {
+  const user = currentUser();
+  if (!user) return;
+  const last = user.lastMysteryBoxAt;
+  const now = Date.now();
+  if (last && now - last < MYSTERY_BOX_COOLDOWN_MS) {
+    toast(t("mystery_box_come_back"));
+    return;
+  }
+
+  const card = document.getElementById("mysteryBoxCard");
+  const btn = document.getElementById("mysteryBoxBtn");
+  const artEl = document.getElementById("mysteryBoxArt");
+  const statusEl = document.getElementById("mysteryBoxStatus");
+  if (btn) btn.disabled = true;
+  if (card) card.classList.add("mystery-box-shaking");
+  if (statusEl) statusEl.innerHTML = "";
+
+  setTimeout(() => {
+    const reward = pickMysteryBoxReward();
+    const u = persistCurrentUser((uu) => {
+      uu.lastMysteryBoxAt = now;
+      uu.mysteryBoxesOpened = (uu.mysteryBoxesOpened || 0) + 1;
+      grantCoins(uu, reward.amount);
+    });
+    if (card) {
+      card.classList.remove("mystery-box-shaking");
+      card.classList.add("mystery-box-reveal");
+    }
+    if (artEl) artEl.textContent = "✨";
+    if (statusEl) {
+      statusEl.innerHTML = `<span class="mystery-box-congrats">${t("mystery_box_congrats")}</span><br>${t("mystery_box_you_received")}: +${reward.amount} ${t("stat_coins")}`;
+    }
+    toast(`${t("mystery_box_congrats")} +${reward.amount} ${t("stat_coins")}`);
+    notifyNewAchievements(u);
+    renderCoinsBadge();
+    setTimeout(() => renderMysteryBoxCard(), 2600);
+  }, 900);
 }
 
 /* ============================================================
@@ -2868,6 +3246,7 @@ function removeCustomAvatar() {
 function switchView(view) {
   // ADDED — leaving the profile/wallet view stops the daily-bonus countdown interval
   stopDailyBonusCountdown();
+  stopMysteryBoxCountdown();
   [
     "store",
     "library",
@@ -2976,6 +3355,9 @@ function clearLibrarySearch() {
 }
 
 function renderStore() {
+  renderGameOfTheDay();
+  renderRecentlyPlayed();
+  renderStoreCategoryFilters();
   const grid = document.getElementById("storeGrid");
   const user = currentUser();
   const owned = user ? user.library : [];
@@ -2984,7 +3366,11 @@ function renderStore() {
 
   const query = readSearchQuery("storeSearchInput");
   updateSearchClearBtn("storeSearchClear", query);
-  const filteredCatalog = CATALOG.filter((g) => gameMatchesSearch(g, query));
+  const filteredCatalog = CATALOG.filter(
+    (g) =>
+      gameMatchesSearch(g, query) &&
+      (currentStoreCategory === "All" || g.tag === currentStoreCategory),
+  );
 
   if (filteredCatalog.length === 0) {
     fadeGridRefresh(grid, () => {
@@ -3117,6 +3503,49 @@ function formatDuration(totalSeconds) {
   return `${m}m`;
 }
 
+/* ============================================================
+   ADDED — PLAYER STATISTICS (Profile view)
+   Built entirely from data the app already tracks elsewhere
+   (gamePlaytime, coins, playedGameIds, mysteryBoxesOpened,
+   recentlyPlayed) — no separate/fake stats.
+   ============================================================ */
+function renderPlayerStatistics() {
+  const user = currentUser();
+  if (!user) return;
+  ensureUserDefaults(user);
+
+  const gamesPlayed = (user.playedGameIds || []).length;
+  const totalSeconds = Object.values(user.gamePlaytime || {}).reduce(
+    (a, b) => a + b,
+    0,
+  );
+  const coinsEarned = user.totalCoinsEarned || 0;
+  const boxesOpened = user.mysteryBoxesOpened || 0;
+
+  const gEl = document.getElementById("pstatGamesPlayed");
+  if (gEl) gEl.textContent = gamesPlayed;
+  const pEl = document.getElementById("pstatTotalPlaytime");
+  if (pEl) pEl.textContent = formatDuration(totalSeconds);
+  const cEl = document.getElementById("pstatCoinsEarned");
+  if (cEl) cEl.textContent = coinsEarned.toLocaleString();
+  const bEl = document.getElementById("pstatMysteryBoxes");
+  if (bEl) bEl.textContent = boxesOpened;
+
+  const recentList = document.getElementById("playerStatsRecentList");
+  if (recentList) {
+    const recentGames = (user.recentlyPlayed || [])
+      .map((id) => CATALOG.find((g) => g.id === id))
+      .filter(Boolean);
+    recentList.innerHTML = recentGames.length
+      ? recentGames
+          .map(
+            (g) => `<span class="player-stats-recent-chip">${g.title}</span>`,
+          )
+          .join("")
+      : `<span class="player-stats-recent-empty">${t("recently_played_empty_title")}</span>`;
+  }
+}
+
 function renderProfile() {
   const user = currentUser();
   if (!user) return;
@@ -3193,6 +3622,10 @@ function renderProfile() {
   // ADDED — coins + premium status
   renderCoinsBadge();
   renderPremiumCard(user);
+
+  // ADDED — Player Statistics + Profile Badges
+  renderPlayerStatistics();
+  renderBadges();
 
   // ADDED — Play Time summary
   const totalSeconds = Object.values(user.gamePlaytime || {}).reduce(
@@ -3530,11 +3963,12 @@ function addToLibrary(id) {
     // ADDED — purchase date/time + coins reward
     uu.purchaseDates = uu.purchaseDates || {};
     uu.purchaseDates[id] = Date.now();
-    uu.coins =
-      (uu.coins || 0) +
-      (finalPrice > 0
+    grantCoins(
+      uu,
+      finalPrice > 0
         ? Math.round(finalPrice * COINS_PER_DOLLAR_SPENT)
-        : COINS_FROM_FREE_ADD);
+        : COINS_FROM_FREE_ADD,
+    );
   });
   toast(
     finalPrice > 0
@@ -3621,6 +4055,7 @@ function unlockedAchievements(u) {
 }
 function notifyNewAchievements(u) {
   if (!u) return;
+  checkNewBadges(u);
   const unlocked = unlockedAchievements(u).map((a) => a.id);
   const prev = u.unlockedAchievementIds || [];
   const fresh = unlocked.filter((id) => !prev.includes(id));
@@ -3631,7 +4066,7 @@ function notifyNewAchievements(u) {
     // page reload can never re-grant coins for achievements already earned)
     const reward = fresh.length * COINS_PER_ACHIEVEMENT;
     persistCurrentUser((uu) => {
-      uu.coins = (uu.coins || 0) + reward;
+      grantCoins(uu, reward);
       uu.unlockedAchievementIds = unlocked;
     });
     renderCoinsBadge();
@@ -3640,6 +4075,81 @@ function notifyNewAchievements(u) {
       uu.unlockedAchievementIds = unlocked;
     });
   }
+}
+
+/* ============================================================
+   ADDED — PROFILE BADGES (unlock check, render, favorite pick)
+   ============================================================ */
+function checkNewBadges(u) {
+  if (!u) return;
+  const unlockedIds = BADGES.filter((b) => b.check(u)).map((b) => b.id);
+  const prev = u.unlockedBadgeIds || [];
+  const fresh = unlockedIds.filter((id) => !prev.includes(id));
+  if (fresh.length || prev.length !== unlockedIds.length) {
+    persistCurrentUser((uu) => {
+      uu.unlockedBadgeIds = unlockedIds;
+    });
+  }
+  fresh.forEach((id) => {
+    const b = BADGES.find((x) => x.id === id);
+    if (b) toast(`${t("badge_unlocked_toast")}: ${b.icon} ${t(b.nameKey)}`);
+  });
+  const profileView = document.getElementById("profileView");
+  if (profileView && !profileView.classList.contains("hidden")) {
+    renderBadges();
+  }
+}
+
+function renderBadges() {
+  const grid = document.getElementById("badgesGrid");
+  const user = currentUser();
+  if (!grid || !user) return;
+  const unlocked = user.unlockedBadgeIds || [];
+
+  grid.innerHTML = BADGES.map((b) => {
+    const isUnlocked = unlocked.includes(b.id);
+    const isFavorite = user.favoriteBadgeId === b.id;
+    const progressHtml =
+      b.target > 1
+        ? `
+        <div class="badge-progress-track"><div class="badge-progress-fill" style="width:${(b.progress(user) / b.target) * 100}%"></div></div>
+        <div class="badge-progress-label">${b.progress(user).toLocaleString()} / ${b.target.toLocaleString()}</div>`
+        : "";
+    return `
+    <div class="badge-card ${isUnlocked ? "unlocked" : "locked"}${isFavorite ? " favorite" : ""}"
+         ${isUnlocked ? `onclick="selectFavoriteBadge('${b.id}')" title="${t("badge_select_favorite_hint")}"` : ""}>
+      <div class="badge-icon">${b.icon}</div>
+      <div class="badge-name">${t(b.nameKey)}</div>
+      <div class="badge-desc">${t(b.descKey)}</div>
+      ${progressHtml}
+      <div class="badge-state">${isUnlocked ? t("badge_state_unlocked") : t("badge_state_locked")}</div>
+    </div>
+  `;
+  }).join("");
+
+  const pill = document.getElementById("heroFavoriteBadgePill");
+  if (pill) {
+    const favBadge = user.favoriteBadgeId
+      ? BADGES.find((b) => b.id === user.favoriteBadgeId)
+      : null;
+    if (favBadge && unlocked.includes(favBadge.id)) {
+      pill.textContent = `${favBadge.icon} ${t(favBadge.nameKey)}`;
+      pill.classList.remove("hidden");
+    } else {
+      pill.classList.add("hidden");
+    }
+  }
+}
+
+function selectFavoriteBadge(id) {
+  const user = currentUser();
+  if (!user) return;
+  const unlocked = user.unlockedBadgeIds || [];
+  if (!unlocked.includes(id)) return;
+  persistCurrentUser((uu) => {
+    uu.favoriteBadgeId = uu.favoriteBadgeId === id ? null : id;
+  });
+  renderBadges();
 }
 function computeXP(u) {
   const xp =
@@ -3942,6 +4452,158 @@ let activeSession = null;
 function playGame(path, gameId) {
   window.open(path, "_blank");
   startPlaySession(gameId);
+  addToRecentlyPlayed(gameId);
+}
+
+/* ============================================================
+   ADDED — RECENTLY PLAYED
+   Tracks the last RECENTLY_PLAYED_MAX unique games launched via
+   playGame(), most-recent first, persisted on the user record the
+   same way the rest of the app persists user data.
+   ============================================================ */
+function addToRecentlyPlayed(gameId) {
+  if (!gameId) return;
+  const user = currentUser();
+  if (!user) return;
+  const u = persistCurrentUser((uu) => {
+    uu.recentlyPlayed = (uu.recentlyPlayed || []).filter(
+      (id) => id !== gameId,
+    );
+    uu.recentlyPlayed.unshift(gameId);
+    uu.recentlyPlayed = uu.recentlyPlayed.slice(0, RECENTLY_PLAYED_MAX);
+    // ADDED — lifetime (uncapped) distinct-games-played list, used by
+    // Player Statistics and the Game Explorer / Collector badges.
+    uu.playedGameIds = uu.playedGameIds || [];
+    if (!uu.playedGameIds.includes(gameId)) uu.playedGameIds.push(gameId);
+  });
+  checkNewBadges(u);
+  const storeView = document.getElementById("storeView");
+  if (storeView && !storeView.classList.contains("hidden")) {
+    renderRecentlyPlayed();
+  }
+}
+
+function renderRecentlyPlayed() {
+  const grid = document.getElementById("recentlyPlayedGrid");
+  if (!grid) return;
+  const user = currentUser();
+  const ids = user && user.recentlyPlayed ? user.recentlyPlayed : [];
+  const games = ids
+    .map((id) => CATALOG.find((g) => g.id === id))
+    .filter(Boolean);
+
+  if (games.length === 0) {
+    grid.innerHTML = `
+      <div class="empty-state recently-played-empty" style="grid-column:1/-1;">
+        <div class="eyebrow">${t("recently_played_empty_title")}</div>
+        <p>${t("recently_played_empty_desc")}</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = games
+    .map(
+      (g) => `
+    <div class="card recently-played-card">
+      <div class="card-art store-art" style="background:linear-gradient(135deg, ${g.color1}, ${g.color2});">
+        <div class="store-art-fallback">
+          <span class="store-art-mono">${gameArtMonogram(g.title)}</span>
+        </div>
+        <img class="store-art-img" src="${g.image}" alt="${g.title}" loading="lazy" decoding="async" onerror="this.style.display='none';" />
+        <span class="card-tag">${g.tag}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title">${g.title}</div>
+        <div class="card-line">${g.blurb}</div>
+        <div class="card-actions">
+          <button class="btn-sm play" onclick="playGame('${g.path}','${g.id}')">▶ ${t("btn_play_again")}</button>
+        </div>
+      </div>
+    </div>
+  `,
+    )
+    .join("");
+}
+
+/* ============================================================
+   ADDED — GAME OF THE DAY
+   Deterministic date-based pick from the existing CATALOG only —
+   the same game stays selected all day (local calendar date) and
+   automatically rotates to the next one at local midnight.
+   ============================================================ */
+function getGameOfTheDay() {
+  const now = new Date();
+  const daysSinceEpoch = Math.floor(
+    Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000,
+  );
+  const index =
+    ((daysSinceEpoch % CATALOG.length) + CATALOG.length) % CATALOG.length;
+  return CATALOG[index];
+}
+
+function renderGameOfTheDay() {
+  const wrap = document.getElementById("gameOfTheDayCard");
+  if (!wrap) return;
+  const g = getGameOfTheDay();
+  const user = currentUser();
+  const owned = user ? user.library.includes(g.id) : false;
+
+  const priceHtml =
+    g.price <= 0
+      ? `<span class="price-badge free">FREE</span>`
+      : `<span class="price-badge paid">$${g.price.toFixed(2)}</span>`;
+  const actionHtml = owned
+    ? `<button class="btn-sm play gotd-action" onclick="playGame('${g.path}','${g.id}')">▶ ${t("btn_play")}</button>`
+    : g.price > 0
+      ? `<button class="btn-sm buy gotd-action" onclick="addToLibrary('${g.id}')">${t("btn_buy")} $${g.price.toFixed(2)}</button>`
+      : `<button class="btn-sm gold gotd-action" onclick="addToLibrary('${g.id}')">${t("btn_add")}</button>`;
+
+  wrap.innerHTML = `
+    <div class="gotd-media" style="background:linear-gradient(135deg, ${g.color1}, ${g.color2});">
+      <img class="gotd-img" src="${g.image}" alt="${g.title}" loading="lazy" decoding="async" onerror="this.style.display='none';">
+      <div class="gotd-scrim"></div>
+      <div class="gotd-kicker">✦ ${t("game_of_the_day_title")}</div>
+    </div>
+    <div class="gotd-body">
+      <div class="gotd-tag">${g.tag}</div>
+      <div class="gotd-title">${g.title}</div>
+      <div class="gotd-blurb">${g.blurb}</div>
+      <div class="gotd-actions">
+        ${priceHtml}
+        <button class="btn-sm line gotd-action" onclick="openDetail('${g.id}')">${t("btn_details")}</button>
+        ${actionHtml}
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   ADDED — GAME CATEGORIES / FILTERS (Store)
+   Categories come only from tags already present on real catalog
+   entries — nothing invented.
+   ============================================================ */
+function getStoreCategories() {
+  const tags = Array.from(new Set(CATALOG.map((g) => g.tag))).sort();
+  return ["All", ...tags];
+}
+
+function renderStoreCategoryFilters() {
+  const wrap = document.getElementById("storeCategoryFilters");
+  if (!wrap) return;
+  const categories = getStoreCategories();
+  if (!categories.includes(currentStoreCategory)) currentStoreCategory = "All";
+  wrap.innerHTML = categories
+    .map((c) => {
+      const label = c === "All" ? t("category_all") : c;
+      const safe = c.replace(/'/g, "\\'");
+      return `<button type="button" class="category-chip${c === currentStoreCategory ? " active" : ""}" onclick="selectStoreCategory('${safe}')">${label}</button>`;
+    })
+    .join("");
+}
+
+function selectStoreCategory(cat) {
+  currentStoreCategory = cat;
+  renderStore();
 }
 
 function startPlaySession(gameId) {
@@ -3992,7 +4654,7 @@ function stopPlaySessionIfActive() {
     uu.gamePlaytime[gameId] = (uu.gamePlaytime[gameId] || 0) + elapsedSeconds;
     uu.playtimeHours =
       Math.round(((uu.playtimeHours || 0) + elapsedSeconds / 3600) * 100) / 100;
-    uu.coins = (uu.coins || 0) + coinsEarned;
+    grantCoins(uu, coinsEarned);
     uu.recentActivity = uu.recentActivity || [];
     uu.recentActivity.unshift({
       gameId,
@@ -4026,6 +4688,7 @@ function renderWallet() {
   document.getElementById("walletBalance").textContent =
     "$" + user.wallet.toFixed(2);
   renderDailyBonusCard(user);
+  renderMysteryBoxCard();
 
   renderTopupAmountGrid();
 
