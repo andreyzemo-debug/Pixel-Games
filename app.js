@@ -226,6 +226,25 @@ const I18N = {
 
     // ADDED — Category filters
     category_all: "All",
+    category_action: "Action",
+    category_shooter: "Shooter",
+    category_fighting: "Fighting",
+    category_rpg: "RPG",
+    category_adventure: "Adventure",
+    category_horror: "Horror",
+    category_survival: "Survival",
+    category_racing: "Racing",
+    category_arcade: "Arcade",
+    category_platformer: "Platformer",
+    category_sandbox: "Sandbox",
+    category_strategy: "Strategy",
+    category_puzzle: "Puzzle",
+    category_simulation: "Simulation",
+    category_sports: "Sports",
+    category_casual: "Casual",
+    category_stealth: "Stealth",
+    category_scifi: "Sci-Fi",
+    category_multiplayer: "Multiplayer",
 
     // ADDED — Player Statistics
     player_stats_heading: "Player Statistics",
@@ -472,6 +491,25 @@ const I18N = {
 
     // ADDED — Category filters
     category_all: "Все",
+    category_action: "Экшен",
+    category_shooter: "Шутеры",
+    category_fighting: "Файтинги",
+    category_rpg: "RPG",
+    category_adventure: "Приключения",
+    category_horror: "Хоррор",
+    category_survival: "Выживание",
+    category_racing: "Гонки",
+    category_arcade: "Аркады",
+    category_platformer: "Платформеры",
+    category_sandbox: "Песочницы",
+    category_strategy: "Стратегии",
+    category_puzzle: "Головоломки",
+    category_simulation: "Симуляторы",
+    category_sports: "Спорт",
+    category_casual: "Казуальные",
+    category_stealth: "Стелс",
+    category_scifi: "Sci-Fi",
+    category_multiplayer: "Мультиплеер",
 
     // ADDED — Player Statistics
     player_stats_heading: "Статистика игрока",
@@ -718,6 +756,25 @@ const I18N = {
 
     // ADDED — Category filters
     category_all: "Barchasi",
+    category_action: "Ekshn",
+    category_shooter: "Otishma",
+    category_fighting: "Jangovar",
+    category_rpg: "RPG",
+    category_adventure: "Sarguzasht",
+    category_horror: "Xorror",
+    category_survival: "Omon qolish",
+    category_racing: "Poyga",
+    category_arcade: "Arkada",
+    category_platformer: "Platformer",
+    category_sandbox: "Sandbox",
+    category_strategy: "Strategiya",
+    category_puzzle: "Jumboq",
+    category_simulation: "Simulyator",
+    category_sports: "Sport",
+    category_casual: "Kazual",
+    category_stealth: "Stels",
+    category_scifi: "Sci-Fi",
+    category_multiplayer: "Multiplayer",
 
     // ADDED — Player Statistics
     player_stats_heading: "O'yinchi statistikasi",
@@ -1884,6 +1941,96 @@ const CATALOG = [
     "Grow your neon snake, collect special food, unlock unique skins, complete missions, and chase the highest score in this modern neon arcade classic.",
   path: "https://snake-games-three.vercel.app/",
   price: 0,
+},
+{
+  id: "g14",
+  title: "VOXEL WORLD",
+  image: "assets/games/voxel-world.webp",
+  tag: "3D Sandbox",
+  color1: "#1a2430",
+  color2: "#4b7a8f",
+  blurb:
+    "Build, explore, and create your own voxel worlds in a free 3D sandbox game playable directly in your browser.",
+  path: "https://voxel-mu.vercel.app/",
+  price: 15,
+},
+
+{
+  id: "g15",
+  title: "METRO RUNNER",
+  image: "assets/games/metro-runner.webp",
+  tag: "3D Endless Runner",
+  color1: "#1b2533",
+  color2: "#4f6f8f",
+  blurb:
+    "Run through dangerous environments, avoid obstacles, collect rewards, and survive as long as possible in this fast-paced endless runner.",
+  path: "https://metrorunner.vercel.app/",
+  price: 6.99,
+},
+
+{
+  id: "g16",
+  title: "JOHN PORK VS TIM CHEESE",
+  image: "assets/games/john-pork-vs-tim-cheese.webp",
+  tag: "3D Fighting",
+  color1: "#38231f",
+  color2: "#9b4d3a",
+  blurb:
+    "Enter a chaotic 3D battle arena and fight your opponent in a fast-paced and ridiculous showdown.",
+  path: "https://timcheese.vercel.app/",
+  price: 3.99,
+},
+
+{
+  id: "g17",
+  title: "NEXT PONG",
+  image: "assets/games/next-pong.webp",
+  tag: "Arcade",
+  color1: "#151d2b",
+  color2: "#42658a",
+  blurb:
+    "Challenge your opponent in a modern 3D take on the classic Pong experience and prove your reflexes.",
+  path: "https://next-pong.vercel.app/",
+  price: 7,
+},
+
+{
+  id: "g18",
+  title: "UNFINISHED ROBOT",
+  image: "assets/games/unfinished-robot.webp",
+  tag: "3D Platformer",
+  color1: "#20252d",
+  color2: "#657789",
+  blurb:
+    "Control a mysterious robot, explore a strange world, overcome obstacles, and discover what lies beyond the unfinished world.",
+  path: "https://unfinished-robot-game.vercel.app/",
+  price: 12.99,
+},
+
+{
+  id: "g19",
+  title: "EMBERVALE",
+  image: "assets/games/embervale.webp",
+  tag: "3D Survival",
+  color1: "#33251e",
+  color2: "#a85d36",
+  blurb:
+    "Explore a beautiful voxel world, survive dangerous encounters, fight enemies, and discover the secrets hidden across Embervale.",
+  path: "https://embervale-amber.vercel.app/",
+  price: 6.99,
+},
+
+{
+  id: "g20",
+  title: "QUANTUM CHESS",
+  image: "assets/games/quantum-chess.webp",
+  tag: "Strategy",
+  color1: "#171b2e",
+  color2: "#4f5fa8",
+  blurb:
+    "Experience chess in a completely new way with quantum mechanics, unpredictable moves, and strategic possibilities beyond traditional chess.",
+  path: "https://quantumchess.vercel.app/",
+  price: 3.99,
 },
 ];
 
@@ -3282,10 +3429,16 @@ function switchView(view) {
 function gameMatchesSearch(game, query) {
   if (!query) return true;
   const q = query.toLowerCase();
+  const categoryMatch = getGameCategories(game).some((cat) => {
+    if (cat.includes(q)) return true;
+    const label = t(`category_${cat}`);
+    return label && label.toLowerCase().includes(q);
+  });
   return (
     (game.title && game.title.toLowerCase().includes(q)) ||
     (game.tag && game.tag.toLowerCase().includes(q)) ||
-    (game.blurb && game.blurb.toLowerCase().includes(q))
+    (game.blurb && game.blurb.toLowerCase().includes(q)) ||
+    categoryMatch
   );
 }
 
@@ -3369,7 +3522,8 @@ function renderStore() {
   const filteredCatalog = CATALOG.filter(
     (g) =>
       gameMatchesSearch(g, query) &&
-      (currentStoreCategory === "All" || g.tag === currentStoreCategory),
+      (currentStoreCategory === "All" ||
+        getGameCategories(g).includes(currentStoreCategory)),
   );
 
   if (filteredCatalog.length === 0) {
@@ -4579,12 +4733,90 @@ function renderGameOfTheDay() {
 
 /* ============================================================
    ADDED — GAME CATEGORIES / FILTERS (Store)
-   Categories come only from tags already present on real catalog
-   entries — nothing invented.
+   The catalog's detailed `tag` field (e.g. "3D Sci-Fi Survival") is
+   kept 100% intact and still shown on cards, the Game Details page,
+   Game of the Day, and used by search. It is NOT used to build the
+   filter bar anymore.
+
+   Instead, the filter bar uses a fixed list of broad, universal
+   genres (BROAD_CATEGORIES). Each detailed tag is mapped to one or
+   more broad categories via TAG_TO_CATEGORIES, so a single game can
+   match multiple broad filters (e.g. "3D Action RPG" -> Action + RPG).
+
+   This keeps the filter bar clean and stable no matter how many new
+   games — or new detailed tags — get added later. A tag that isn't
+   in the map yet simply won't match any broad category (it still
+   shows fine under "All" and in search).
    ============================================================ */
+
+// Fixed, ordered list of broad category keys shown in the filter bar.
+// "all" is handled separately and always shown first.
+const BROAD_CATEGORIES = [
+  "action",
+  "shooter",
+  "fighting",
+  "rpg",
+  "adventure",
+  "horror",
+  "survival",
+  "racing",
+  "arcade",
+  "platformer",
+  "sandbox",
+  "strategy",
+  "puzzle",
+  "simulation",
+  "sports",
+  "casual",
+  "stealth",
+  "scifi",
+  "multiplayer",
+];
+
+// Detailed catalog tag -> one or more broad category keys.
+// Keys are matched case-insensitively against game.tag.
+const TAG_TO_CATEGORIES = {
+  "3d action rpg": ["action", "rpg"],
+  "3d adventure": ["adventure"],
+  "3d arcade racing": ["racing", "arcade"],
+  "3d endless runner": ["arcade"],
+  "3d fighting": ["fighting", "action"],
+  "3d horror adventure": ["horror", "adventure"],
+  "3d open world adventure": ["adventure"],
+  "3d open world survival": ["survival", "adventure"],
+  "3d platformer": ["platformer", "action"],
+  "3d sandbox": ["sandbox"],
+  "3d sci-fi survival": ["scifi", "survival"],
+  "3d stealth action": ["stealth", "action"],
+  "3d survival": ["survival"],
+  "aim trainer": ["shooter", "action"],
+  arcade: ["arcade"],
+  "neon arcade classic": ["arcade"],
+  "neon arcade racing": ["racing", "arcade"],
+  "neon strategy classic": ["strategy"],
+  shooter: ["shooter"],
+  strategy: ["strategy"],
+};
+
+/* Returns the list of broad category keys a game belongs to, derived
+   from its detailed tag. A tag with no mapping yet returns []. */
+function getGameCategories(game) {
+  if (!game || !game.tag) return [];
+  return TAG_TO_CATEGORIES[game.tag.toLowerCase()] || [];
+}
+
+/* Builds the ordered list of categories to render in the filter bar:
+   "All" first, then every broad category from BROAD_CATEGORIES that
+   currently has at least one matching game — so the bar never shows
+   dead/empty buttons, but automatically picks up new categories as
+   soon as a game using them is added to the catalog. */
 function getStoreCategories() {
-  const tags = Array.from(new Set(CATALOG.map((g) => g.tag))).sort();
-  return ["All", ...tags];
+  const active = new Set();
+  CATALOG.forEach((g) => {
+    getGameCategories(g).forEach((cat) => active.add(cat));
+  });
+  const populated = BROAD_CATEGORIES.filter((cat) => active.has(cat));
+  return ["All", ...populated];
 }
 
 function renderStoreCategoryFilters() {
@@ -4594,7 +4826,7 @@ function renderStoreCategoryFilters() {
   if (!categories.includes(currentStoreCategory)) currentStoreCategory = "All";
   wrap.innerHTML = categories
     .map((c) => {
-      const label = c === "All" ? t("category_all") : c;
+      const label = c === "All" ? t("category_all") : t(`category_${c}`);
       const safe = c.replace(/'/g, "\\'");
       return `<button type="button" class="category-chip${c === currentStoreCategory ? " active" : ""}" onclick="selectStoreCategory('${safe}')">${label}</button>`;
     })
