@@ -46,6 +46,8 @@ const I18N = {
     promo_slide_1: "New games are now available for everyone",
     promo_slide_2: "This space could be your advertisement",
     promo_slide_3: "Don't miss the chance to buy the latest games",
+    promo_slide_4: "Your next adventure starts here",
+    promo_slide_5: "Play. Discover. Enjoy.",
 
     library_title: "Library",
     library_desc: "Games you own. Hit Play to launch.",
@@ -239,6 +241,8 @@ const I18N = {
     promo_slide_1: "Новые игры уже доступны для всех",
     promo_slide_2: "Это место может стать вашей рекламой",
     promo_slide_3: "Не упустите шанс купить новейшие игры",
+    promo_slide_4: "Ваше следующее приключение начинается здесь",
+    promo_slide_5: "Играй. Открывай. Наслаждайся.",
 
     library_title: "Библиотека",
     library_desc:
@@ -432,6 +436,8 @@ const I18N = {
     promo_slide_1: "Yangi o'yinlar endi barchaga mavjud",
     promo_slide_2: "Bu joy sizning reklamangiz bo'lishi mumkin",
     promo_slide_3: "Eng so'nggi o'yinlarni sotib olish imkoniyatini boy bermang",
+    promo_slide_4: "Keyingi sarguzashtingiz aynan shu yerdan boshlanadi",
+    promo_slide_5: "O'yna. Kashf et. Zavqlan.",
 
     library_title: "Kutubxona",
     library_desc:
@@ -707,14 +713,14 @@ function initStorePromoCarousel() {
   if (!carousel) return;
   goToStorePromoSlide(0);
   if (storePromoCarouselTimer) clearInterval(storePromoCarouselTimer);
-  storePromoCarouselTimer = setInterval(advanceStorePromoSlide, 5000);
+  storePromoCarouselTimer = setInterval(advanceStorePromoSlide, 3000);
 
   const dots = document.querySelectorAll("#storePromoDots .promo-dot");
   dots.forEach((dot) => {
     dot.addEventListener("click", () => {
       goToStorePromoSlide(parseInt(dot.dataset.index, 10) || 0);
       if (storePromoCarouselTimer) clearInterval(storePromoCarouselTimer);
-      storePromoCarouselTimer = setInterval(advanceStorePromoSlide, 5000);
+      storePromoCarouselTimer = setInterval(advanceStorePromoSlide, 3000);
     });
   });
 }
@@ -973,31 +979,100 @@ function closeAccentPopover() {
 const BACKGROUND_KEY = "pixelgames_background";
 const BACKGROUND_PRESETS = [
   "default",
-  "midnight",
-  "cyberpunk",
   "ocean",
-  "forest",
-  "sunset",
   "galaxy",
   "aurora",
-  "lavender",
-  "crimson",
-  "desert",
-  "toxic",
-  "royal",
-  "rose",
-  "coffee",
-  "ice",
-  "void",
-  "neon-city",
-  "deep-space",
-  "volcanic",
   "matrix",
   "sakura",
-  "bronze",
-  "storm",
-  "deep-purple",
+  "volcanic",
+  "neon-city",
 ];
+
+/* ---- lightweight particle generation for the animated fx layers ----
+   Each generator runs once (guarded by a "filled" flag) and creates a
+   modest number of small absolutely-positioned spans driven purely by
+   CSS animations (transform/opacity), so there's no per-frame JS and
+   no layout thrashing. Layers the user never selects are never filled. */
+const bgFxFilled = {};
+function rand(min, max) {
+  return Math.random() * (max - min) + min;
+}
+function fillGalaxyStars() {
+  const layer = document.getElementById("fxGalaxy");
+  if (!layer || bgFxFilled.galaxy) return;
+  bgFxFilled.galaxy = true;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 55; i++) {
+    const star = document.createElement("span");
+    const size = rand(1, 2.6);
+    star.className = "star";
+    star.style.left = rand(0, 100) + "%";
+    star.style.top = rand(0, 100) + "%";
+    star.style.width = size + "px";
+    star.style.height = size + "px";
+    star.style.setProperty("--dur", rand(2.5, 6) + "s");
+    star.style.setProperty("--delay", rand(0, 5) + "s");
+    frag.appendChild(star);
+  }
+  layer.appendChild(frag);
+}
+function fillMatrixColumns() {
+  const layer = document.getElementById("fxMatrix");
+  if (!layer || bgFxFilled.matrix) return;
+  bgFxFilled.matrix = true;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 22; i++) {
+    const col = document.createElement("span");
+    col.className = "matrix-col";
+    col.style.left = rand(0, 100) + "%";
+    col.style.height = rand(70, 170) + "px";
+    col.style.setProperty("--dur", rand(4, 9) + "s");
+    col.style.setProperty("--delay", rand(-8, 0) + "s");
+    frag.appendChild(col);
+  }
+  layer.appendChild(frag);
+}
+function fillSakuraPetals() {
+  const layer = document.getElementById("fxSakura");
+  if (!layer || bgFxFilled.sakura) return;
+  bgFxFilled.sakura = true;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 16; i++) {
+    const petal = document.createElement("span");
+    const size = rand(6, 13);
+    petal.className = "petal";
+    petal.style.left = rand(0, 100) + "%";
+    petal.style.width = size + "px";
+    petal.style.height = size + "px";
+    petal.style.setProperty("--dur", rand(10, 19) + "s");
+    petal.style.setProperty("--delay", rand(-16, 0) + "s");
+    petal.style.setProperty("--drift", rand(-70, 70) + "px");
+    frag.appendChild(petal);
+  }
+  layer.appendChild(frag);
+}
+function fillVolcanicEmbers() {
+  const layer = document.getElementById("fxVolcanic");
+  if (!layer || bgFxFilled.volcanic) return;
+  bgFxFilled.volcanic = true;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 20; i++) {
+    const ember = document.createElement("span");
+    ember.className = "ember";
+    ember.style.left = rand(0, 100) + "%";
+    ember.style.setProperty("--dur", rand(6, 11) + "s");
+    ember.style.setProperty("--delay", rand(-10, 0) + "s");
+    ember.style.setProperty("--drift", rand(-30, 30) + "px");
+    frag.appendChild(ember);
+  }
+  layer.appendChild(frag);
+}
+function ensureBgFxParticles(name) {
+  if (name === "galaxy") fillGalaxyStars();
+  else if (name === "matrix") fillMatrixColumns();
+  else if (name === "sakura") fillSakuraPetals();
+  else if (name === "volcanic") fillVolcanicEmbers();
+}
 
 function applyBackgroundPreset(name) {
   document.documentElement.setAttribute("data-bg", name || "default");
@@ -1005,6 +1080,7 @@ function applyBackgroundPreset(name) {
   document.documentElement.style.removeProperty("--page-bg-1");
   document.documentElement.style.removeProperty("--page-bg-2");
   document.documentElement.style.removeProperty("--page-bg-base");
+  ensureBgFxParticles(name);
 }
 function applyCustomBackground(hex) {
   // A custom color always wins over any preset attribute.

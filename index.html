@@ -22,6 +22,12 @@
       }
       document.documentElement.setAttribute('data-accent', accent);
     }catch(e){}
+    try{
+      var savedBg = JSON.parse(localStorage.getItem('pixelgames_background') || 'null');
+      if(savedBg && savedBg.type === 'preset' && savedBg.value && savedBg.value !== 'default'){
+        document.documentElement.setAttribute('data-bg', savedBg.value);
+      }
+    }catch(e){}
   })();
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +35,33 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- ================= ANIMATED BACKGROUND EFFECTS (added) =================
+     Sits behind all page content (first element in <body>, pointer-events:none).
+     Only the effect matching the active html[data-bg] attribute is rendered;
+     the rest stay display:none so no off-screen animation ever runs. -->
+<div class="bg-fx-layer" id="bgFxLayer" aria-hidden="true">
+  <div class="bg-fx bg-fx-ocean" id="fxOcean">
+    <span class="ocean-wave ocean-wave-1"></span>
+    <span class="ocean-wave ocean-wave-2"></span>
+    <span class="ocean-wave ocean-wave-3"></span>
+    <span class="ocean-shimmer"></span>
+  </div>
+  <div class="bg-fx bg-fx-galaxy" id="fxGalaxy"></div>
+  <div class="bg-fx bg-fx-aurora" id="fxAurora">
+    <span class="aurora-band aurora-band-1"></span>
+    <span class="aurora-band aurora-band-2"></span>
+    <span class="aurora-band aurora-band-3"></span>
+  </div>
+  <div class="bg-fx bg-fx-matrix" id="fxMatrix"></div>
+  <div class="bg-fx bg-fx-sakura" id="fxSakura"></div>
+  <div class="bg-fx bg-fx-volcanic" id="fxVolcanic"></div>
+  <div class="bg-fx bg-fx-neon-city" id="fxNeonCity">
+    <span class="neon-glow neon-glow-1"></span>
+    <span class="neon-glow neon-glow-2"></span>
+    <span class="neon-glow neon-glow-3"></span>
+  </div>
+</div>
 
 <!-- ================= LANGUAGE SELECTION SCREEN (added) ================= -->
 <div id="languageScreen">
@@ -231,30 +264,13 @@
             <div class="accent-popover-label">Background</div>
             <div class="bg-preset-grid" id="bgPresetGrid">
               <button type="button" class="bg-chip" data-bg-name="default" onclick="selectBackgroundPreset(this)" title="Default"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#d4a94a,#5fbfb3)"></span>Default</button>
-              <button type="button" class="bg-chip" data-bg-name="midnight" onclick="selectBackgroundPreset(this)" title="Midnight"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#1c2a4a,#05070f)"></span>Midnight</button>
-              <button type="button" class="bg-chip" data-bg-name="cyberpunk" onclick="selectBackgroundPreset(this)" title="Cyberpunk"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#9b6bff,#22d3ee)"></span>Cyberpunk</button>
-              <button type="button" class="bg-chip" data-bg-name="ocean" onclick="selectBackgroundPreset(this)" title="Ocean"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#22d3ee,#0a2a3d)"></span>Ocean</button>
-              <button type="button" class="bg-chip" data-bg-name="forest" onclick="selectBackgroundPreset(this)" title="Forest"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#10b981,#07281c)"></span>Forest</button>
-              <button type="button" class="bg-chip" data-bg-name="sunset" onclick="selectBackgroundPreset(this)" title="Sunset"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#f97316,#7c1d0d)"></span>Sunset</button>
-              <button type="button" class="bg-chip" data-bg-name="galaxy" onclick="selectBackgroundPreset(this)" title="Galaxy"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#9b6bff,#1a0b33)"></span>Galaxy</button>
-              <button type="button" class="bg-chip" data-bg-name="aurora" onclick="selectBackgroundPreset(this)" title="Aurora"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#34d399,#22d3ee)"></span>Aurora</button>
-              <button type="button" class="bg-chip" data-bg-name="lavender" onclick="selectBackgroundPreset(this)" title="Lavender"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#c4a3ff,#8b5cf6)"></span>Lavender</button>
-              <button type="button" class="bg-chip" data-bg-name="crimson" onclick="selectBackgroundPreset(this)" title="Crimson"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#dc2626,#7f1d1d)"></span>Crimson</button>
-              <button type="button" class="bg-chip" data-bg-name="desert" onclick="selectBackgroundPreset(this)" title="Desert"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#d9a45a,#b45309)"></span>Desert</button>
-              <button type="button" class="bg-chip" data-bg-name="toxic" onclick="selectBackgroundPreset(this)" title="Toxic"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#a3e635,#166534)"></span>Toxic</button>
-              <button type="button" class="bg-chip" data-bg-name="royal" onclick="selectBackgroundPreset(this)" title="Royal"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#4338ca,#7c3aed)"></span>Royal</button>
-              <button type="button" class="bg-chip" data-bg-name="rose" onclick="selectBackgroundPreset(this)" title="Rose"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#f43f5e,#9f1239)"></span>Rose</button>
-              <button type="button" class="bg-chip" data-bg-name="coffee" onclick="selectBackgroundPreset(this)" title="Coffee"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#92623c,#3d2817)"></span>Coffee</button>
-              <button type="button" class="bg-chip" data-bg-name="ice" onclick="selectBackgroundPreset(this)" title="Ice"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#a5f3fc,#0e7490)"></span>Ice</button>
-              <button type="button" class="bg-chip" data-bg-name="void" onclick="selectBackgroundPreset(this)" title="Void"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#2a2a2e,#030303)"></span>Void</button>
-              <button type="button" class="bg-chip" data-bg-name="neon-city" onclick="selectBackgroundPreset(this)" title="Neon City"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#d946ef,#22d3ee)"></span>Neon City</button>
-              <button type="button" class="bg-chip" data-bg-name="deep-space" onclick="selectBackgroundPreset(this)" title="Deep Space"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#581c87,#1e1b4b)"></span>Deep Space</button>
-              <button type="button" class="bg-chip" data-bg-name="volcanic" onclick="selectBackgroundPreset(this)" title="Volcanic"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#ef4444,#1a0403)"></span>Volcanic</button>
-              <button type="button" class="bg-chip" data-bg-name="matrix" onclick="selectBackgroundPreset(this)" title="Matrix"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#4ade80,#14532d)"></span>Matrix</button>
-              <button type="button" class="bg-chip" data-bg-name="sakura" onclick="selectBackgroundPreset(this)" title="Sakura"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#f472b6,#a855f7)"></span>Sakura</button>
-              <button type="button" class="bg-chip" data-bg-name="bronze" onclick="selectBackgroundPreset(this)" title="Bronze"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#cd7f32,#5a3a1a)"></span>Bronze</button>
-              <button type="button" class="bg-chip" data-bg-name="storm" onclick="selectBackgroundPreset(this)" title="Storm"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#94a3b8,#1e293b)"></span>Storm</button>
-              <button type="button" class="bg-chip" data-bg-name="deep-purple" onclick="selectBackgroundPreset(this)" title="Deep Purple"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#7e22ce,#2e1065)"></span>Deep Purple</button>
+              <button type="button" class="bg-chip" data-bg-name="ocean" onclick="selectBackgroundPreset(this)" title="Ocean"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#22d3ee,#0a2a3d)"></span>Ocean 🌊</button>
+              <button type="button" class="bg-chip" data-bg-name="galaxy" onclick="selectBackgroundPreset(this)" title="Galaxy"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#9b6bff,#1a0b33)"></span>Galaxy 🌌</button>
+              <button type="button" class="bg-chip" data-bg-name="aurora" onclick="selectBackgroundPreset(this)" title="Aurora"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#34d399,#22d3ee)"></span>Aurora ✨</button>
+              <button type="button" class="bg-chip" data-bg-name="matrix" onclick="selectBackgroundPreset(this)" title="Matrix"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#4ade80,#14532d)"></span>Matrix 🟢</button>
+              <button type="button" class="bg-chip" data-bg-name="sakura" onclick="selectBackgroundPreset(this)" title="Sakura"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#f472b6,#a855f7)"></span>Sakura 🌸</button>
+              <button type="button" class="bg-chip" data-bg-name="volcanic" onclick="selectBackgroundPreset(this)" title="Volcanic"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#ef4444,#1a0403)"></span>Volcanic 🌋</button>
+              <button type="button" class="bg-chip" data-bg-name="neon-city" onclick="selectBackgroundPreset(this)" title="Neon City"><span class="bg-chip-swatch" style="background:linear-gradient(135deg,#d946ef,#22d3ee)"></span>Neon City 🌃</button>
             </div>
           </div>
 
@@ -288,7 +304,7 @@
         <div class="promo-carousel-track" id="storePromoTrack">
           <div class="promo-slide active" data-index="0">
             <div class="promo-slide-media">
-              <img class="promo-slide-img" src="assets/games/shadowrite.webp" alt="" loading="eager">
+              <img class="promo-slide-img" src="assets/banner/new-games.webp" alt="" loading="eager">
             </div>
             <div class="promo-slide-scrim" aria-hidden="true"></div>
             <div class="promo-slide-content">
@@ -298,7 +314,7 @@
           </div>
           <div class="promo-slide" data-index="1">
             <div class="promo-slide-media">
-              <img class="promo-slide-img" src="assets/games/mars-outpost.webp" alt="" loading="lazy">
+              <img class="promo-slide-img" src="assets/banner/advertisement.webp" alt="" loading="lazy">
             </div>
             <div class="promo-slide-scrim" aria-hidden="true"></div>
             <div class="promo-slide-content">
@@ -308,7 +324,7 @@
           </div>
           <div class="promo-slide" data-index="2">
             <div class="promo-slide-media">
-              <img class="promo-slide-img" src="assets/games/neon-drift.webp" alt="" loading="lazy">
+              <img class="promo-slide-img" src="assets/banner/latest-games.webp" alt="" loading="lazy">
             </div>
             <div class="promo-slide-scrim" aria-hidden="true"></div>
             <div class="promo-slide-content">
@@ -316,11 +332,33 @@
               <div class="promo-slide-text" data-i18n="promo_slide_3">Don't miss the chance to buy the latest games</div>
             </div>
           </div>
+          <div class="promo-slide" data-index="3">
+            <div class="promo-slide-media">
+              <img class="promo-slide-img" src="assets/banner/next-adventure.webp" alt="" loading="lazy">
+            </div>
+            <div class="promo-slide-scrim" aria-hidden="true"></div>
+            <div class="promo-slide-content">
+              <div class="promo-slide-kicker">PIXEL &amp; GAMES STORE</div>
+              <div class="promo-slide-text" data-i18n="promo_slide_4">Your next adventure starts here</div>
+            </div>
+          </div>
+          <div class="promo-slide" data-index="4">
+            <div class="promo-slide-media">
+              <img class="promo-slide-img" src="assets/banner/play-discover-enjoy.webp" alt="" loading="lazy">
+            </div>
+            <div class="promo-slide-scrim" aria-hidden="true"></div>
+            <div class="promo-slide-content">
+              <div class="promo-slide-kicker">PIXEL &amp; GAMES STORE</div>
+              <div class="promo-slide-text" data-i18n="promo_slide_5">Play. Discover. Enjoy.</div>
+            </div>
+          </div>
         </div>
         <div class="promo-carousel-dots" id="storePromoDots">
           <span class="promo-dot active" data-index="0"></span>
           <span class="promo-dot" data-index="1"></span>
           <span class="promo-dot" data-index="2"></span>
+          <span class="promo-dot" data-index="3"></span>
+          <span class="promo-dot" data-index="4"></span>
         </div>
       </div>
 
